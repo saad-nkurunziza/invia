@@ -1,0 +1,253 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+// Enums
+enum UserRole {
+  WORKER
+  ADMIN
+}
+
+enum MovementType {
+  IN
+  OUT
+}
+
+enum Currency {
+  USD
+  EUR
+  GBP
+}
+
+enum LogType {
+  NEW_SUPPLIER
+  NEW_PRODUCT
+  NEW_PRODUCT_VERSION
+  SUPPLIER_UPDATE
+  PRODUCT_UPDATE
+  PRODUCT_VERSION_UPDATE
+  PRODUCT_DELETE
+  PRODUCT_VERSION_DELETE
+  SUPPLIER_DELETE
+  STOCK_MOVEMENT
+  USER_ACTION
+}
+
+enum ProductStatus {
+  ACTIVE
+  DISCONTINUED
+  OUT_OF_STOCK
+}
+
+// Core business models
+model Business {
+  id                  String          @id @default(cuid())
+  name                String
+  registration_number String          @unique
+  address             String?
+  tel                 String?         @unique
+  email               String?         @unique
+  currency            Currency        @default(USD)
+  workers             BusinessUser[]
+  products            Product[]
+  suppliers           Supplier[]
+  logs                Log[]
+  preferences         Preferences[]
+  analysis_stats      AnalysisStats[]
+  transactions        StockMovement[]
+  created_at          DateTime        @default(now())
+  updated_at          DateTime        @updatedAt
+  deleted_at          DateTime?
+
+  @@map("businesses")
+}
+
+model User {
+  id             String          @id @default(cuid())
+  name           String?
+  email          String          @unique
+  password       String?
+  role           UserRole        @default(WORKER)
+  email_verified DateTime?
+  image          String?
+  phone          String?
+  accounts       Account[]
+  transactions   StockMovement[]
+  logs           Log[]
+  created_at     DateTime        @default(now())
+  updated_at     DateTime        @updatedAt
+  deleted_at     DateTime?
+  businesses     BusinessUser[]
+
+  @@map("users")
+}
+
+model BusinessUser {
+  id          String    @id @default(cuid())
+  user        User      @relation(fields: [user_id], references: [id])
+  user_id     String
+  business    Business  @relation(fields: [business_id], references: [id])
+  business_id String
+  join_date   DateTime  @default(now())
+  last_access DateTime  @updatedAt
+  deleted_at  DateTime?
+
+  @@unique([user_id, business_id])
+  @@map("business_users")
+}
+
+model Product {
+  id                 String           @id @default(cuid())
+  name               String
+  description        String?
+  logs               Log[]
+  transactions       StockMovement[]
+  business           Business         @relation(fields: [business_id], references: [id])
+  business_id        String
+  current_version    ProductVersion?  @relation("CurrentVersion", fields: [current_version_id], references: [id])
+  current_version_id String?          @unique
+  versions           ProductVersion[]
+  created_at         DateTime         @default(now())
+  updated_at         DateTime         @updatedAt
+  deleted_at         DateTime?
+  supplier           Supplier?        @relation(fields: [supplier_id], references: [id])
+  supplier_id        String?
+
+  @@index([business_id])
+  @@index([name])
+  @@map("products")
+}
+
+model ProductVersion {
+  id                  String        @id @default(cuid())
+  product             Product       @relation(fields: [product_id], references: [id])
+  product_id          String
+  name                String
+  stock               Int           @db.Integer
+  description         String?
+  buying_price        Decimal       @db.Decimal(10, 2)
+  selling_price       Decimal       @db.Decimal(10, 2)
+  status              ProductStatus @default(ACTIVE)
+  threshold           Int           @db.Integer
+  category            String?
+  version_id          String
+  supplier            Supplier?     @relation(fields: [supplier_id], references: [id])
+  supplier_id         String?
+  expiry_date         DateTime?
+  created_at          DateTime      @default(now())
+  updated_at          DateTime      @updatedAt
+  current_for_product Product?      @relation("CurrentVersion")
+  sku                 String?       @unique
+
+  @@unique([product_id, version_id])
+  @@index([product_id, created_at])
+}
+
+model Supplier {
+  id               String           @id @default(cuid())
+  name             String
+  address          String?
+  tel              String
+  email            String           @unique
+  products         Product[]
+  logs             Log[]
+  business         Business         @relation(fields: [business_id], references: [id])
+  business_id      String
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @updatedAt
+  deleted_at       DateTime?
+  product_versions ProductVersion[]
+}
+
+// Operational models
+model StockMovement {
+  id          String       @id @default(cuid())
+  product     Product      @relation(fields: [product_id], references: [id])
+  product_id  String
+  quantity    Int
+  type        MovementType
+  user        User         @relation(fields: [user_id], references: [id])
+  user_id     String
+  business    Business     @relation(fields: [business_id], references: [id])
+  business_id String
+  created_at  DateTime     @default(now())
+
+  @@map("stock_movements")
+}
+
+model Log {
+  id          String    @id @default(cuid())
+  type        LogType
+  product     Product?  @relation(fields: [product_id], references: [id])
+  product_id  String?
+  supplier    Supplier? @relation(fields: [supplier_id], references: [id])
+  supplier_id String?
+  user        User?     @relation(fields: [user_id], references: [id])
+  user_id     String?
+  business    Business  @relation(fields: [business_id], references: [id])
+  business_id String
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  @@map("logistics")
+}
+
+// Configuration and analysis models
+model Preferences {
+  id          String   @id @default(cuid())
+  key         String
+  value       String
+  business    Business @relation(fields: [business_id], references: [id])
+  business_id String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@unique([key, business_id])
+}
+
+model AnalysisStats {
+  id          String   @id @default(cuid())
+  key         String
+  value       Float
+  business    Business @relation(fields: [business_id], references: [id])
+  business_id String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@unique([key, business_id, created_at])
+}
+
+// Authentication models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
