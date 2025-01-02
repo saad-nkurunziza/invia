@@ -45,7 +45,7 @@ const OnboardingJoinForm = () => {
   const { isSubmitting } = form.formState;
 
   const onSubmit = async (values: OnboardingJoinFormValues) => {
-    console.log(values);
+    values;
     try {
       const response = await join(values);
 

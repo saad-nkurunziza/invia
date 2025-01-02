@@ -1,13 +1,17 @@
 "use server";
+import { CreateSupplierFormSchema } from "@/components/input/create-supplier-form";
 import { db } from "@/lib/db";
 import { getAuthenticatedUser } from "@/server/auth";
 import type { Supplier } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
-export async function addSupplier(supplier: Supplier) {
+export async function addSupplier(
+  supplier: z.infer<typeof CreateSupplierFormSchema>
+) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const existingSupplier = await db.supplier.findFirst({
       where: {
@@ -26,7 +30,7 @@ export async function addSupplier(supplier: Supplier) {
       const createdSupplier = await tx.supplier.create({
         data: {
           ...supplier,
-          //   business: { connect: { id: user?.businessId } },
+          business_id: user.businessId ?? "",
         },
       });
 
@@ -56,11 +60,11 @@ export async function addSupplier(supplier: Supplier) {
 
     return newSupplier;
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error adding supplier: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error adding supplier`,
+    };
   }
 }
 
@@ -70,7 +74,7 @@ export async function editSupplier(
 ) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const updatedSupplier = await db.$transaction(async (tx) => {
       const existingSupplier = await tx.supplier.findUnique({
@@ -120,18 +124,18 @@ export async function editSupplier(
 
     return updatedSupplier;
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error updating supplier: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error updating supplier `,
+    };
   }
 }
 
 export async function deleteSupplier(supplierId: string) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const result = await db.$transaction(async (tx) => {
       const supplier = await tx.supplier.findUnique({
@@ -176,10 +180,10 @@ export async function deleteSupplier(supplierId: string) {
 
     return result;
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Failed to delete supplier: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Failed to delete supplier `,
+    };
   }
 }

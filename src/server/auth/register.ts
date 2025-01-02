@@ -1,7 +1,7 @@
 "use server";
 import { signIn } from "@/lib/auth";
 import { DEFAULT_AUTH_REDIRECT } from "@/routes";
-import { RegisterSchema, AuthResponse } from "@/types";
+import { RegisterSchema, AuthResponse } from "@/auth-types";
 import { AuthError } from "next-auth";
 import { db } from "@/lib/db";
 import { z } from "zod";
@@ -11,7 +11,7 @@ export const register = async (
   values: z.infer<typeof RegisterSchema>
 ): Promise<AuthResponse> => {
   const { email, password, name } = values;
-
+  ({ values });
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {

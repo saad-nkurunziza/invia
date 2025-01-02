@@ -6,7 +6,7 @@ import { startOfDay } from "date-fns";
 export async function calculatePurchaseStockValue() {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const products = await db.stockMovement.findMany({
       where: { business_id: user.businessId },
@@ -28,18 +28,18 @@ export async function calculatePurchaseStockValue() {
       data: marketCapValue,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error calculating purchase stock value: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error calculating purchase stock value `,
+    };
   }
 }
 
 export async function calculateSaleStockValue() {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const products = await db.stockMovement.findMany({
       where: { business_id: user.businessId, type: "OUT" },
@@ -61,11 +61,11 @@ export async function calculateSaleStockValue() {
       data: saleValue,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error calculating sale stock value: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error calculating sale stock value `,
+    };
   }
 }
 
@@ -94,18 +94,18 @@ export async function calculateExpectedStockProfit() {
       data: profit,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error calculating expected stock profit: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error calculating expected stock profit `,
+    };
   }
 }
 
 export async function productWithMaxStock() {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const product = await db.product.findFirst({
       where: { business_id: user.businessId },
@@ -125,18 +125,18 @@ export async function productWithMaxStock() {
       data: product,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error retrieving product with max stock: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error retrieving product with max stock `,
+    };
   }
 }
 
 export async function productWithMinStock() {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const product = await db.product.findFirst({
       where: { business_id: user.businessId },
@@ -156,18 +156,18 @@ export async function productWithMinStock() {
       data: product,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error retrieving product with min stock: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error retrieving product with min stock `,
+    };
   }
 }
 
 export async function profitPerDay(date: Date) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const sales = await db.stockMovement.aggregate({
       _sum: {
@@ -203,10 +203,10 @@ export async function profitPerDay(date: Date) {
       data: profit,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error calculating profit per day: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error calculating profit per day `,
+    };
   }
 }

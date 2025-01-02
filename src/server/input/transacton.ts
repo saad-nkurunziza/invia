@@ -9,7 +9,7 @@ export async function deductProductQuantity(
 ) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const result = await db.$transaction(async (tx) => {
       const existingProduct = await tx.product.findFirst({
@@ -83,11 +83,11 @@ export async function deductProductQuantity(
 
     return result;
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error deducting stock: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error deducting stock `,
+    };
   }
 }
 
@@ -98,7 +98,7 @@ export async function incrementProductQuantity(
 ) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const result = await db.$transaction(async (tx) => {
       const existingProduct = await tx.product.findFirst({
@@ -159,10 +159,10 @@ export async function incrementProductQuantity(
 
     return result;
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error incrementing stock: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error incrementing stock `,
+    };
   }
 }

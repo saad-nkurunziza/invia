@@ -2,7 +2,7 @@ import Github from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import type { NextAuthConfig } from "next-auth";
-import { LoginSchema } from "@/types";
+import { LoginSchema } from "@/auth-types";
 import { getUserByEmail } from "@/server/user";
 
 export default {
@@ -20,9 +20,13 @@ export default {
           if (!user || !user.password) return null;
           const passwordMatch = await bcrypt.compare(password, user.password);
           if (passwordMatch) {
+            const businessId =
+              user.businesses && user.businesses.length > 0
+                ? user.businesses[0].business_id
+                : undefined;
             return {
               ...user,
-              businessId: user.businesses[0].business_id ?? undefined,
+              businessId,
             };
           }
         }

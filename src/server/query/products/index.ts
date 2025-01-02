@@ -1,15 +1,29 @@
 "use server";
 import { db } from "@/lib/db";
 import { getAuthenticatedUser } from "@/server/auth";
+import { Prisma } from "@prisma/client";
 import { startOfMonth, endOfMonth, subMonths } from "date-fns";
 
-export async function fetchProducts() {
+export async function fetchProducts(date?: Date) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
+
+    const whereClause: Prisma.ProductWhereInput = date
+      ? {
+          created_at: {
+            gte: startOfMonth(date),
+            lt: endOfMonth(date),
+          },
+        }
+      : {};
 
     const products = await db.product.findMany({
-      where: { business_id: user.businessId, deleted_at: null },
+      where: {
+        business_id: user.businessId,
+        deleted_at: null,
+        ...whereClause,
+      },
       orderBy: { updated_at: "desc" },
       include: { current_version: true, versions: true },
     });
@@ -20,18 +34,18 @@ export async function fetchProducts() {
       data: products,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error fetching products: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error fetching products `,
+    };
   }
 }
 
 export async function fetchProductById(productId: string) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const product = await db.product.findUnique({
       where: {
@@ -55,21 +69,34 @@ export async function fetchProductById(productId: string) {
       data: product,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error fetching product: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error fetching product `,
+    };
   }
 }
 
-export async function fetchProductsExtended() {
+export async function fetchProductsExtended(date?: Date) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
+
+    const whereClause: Prisma.ProductWhereInput = date
+      ? {
+          created_at: {
+            gte: startOfMonth(date),
+            lt: endOfMonth(date),
+          },
+        }
+      : {};
 
     const products = await db.product.findMany({
-      where: { business_id: user.businessId, deleted_at: null },
+      where: {
+        business_id: user.businessId,
+        deleted_at: null,
+        ...whereClause,
+      },
       include: {
         current_version: true,
         supplier: true,
@@ -92,24 +119,34 @@ export async function fetchProductsExtended() {
       data: products,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error fetching extended products: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error fetching extended products `,
+    };
   }
 }
 
-export async function fetchProductCategories(category: string) {
+export async function fetchProductCategories(category: string, date?: Date) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
+
+    const whereClause: Prisma.ProductWhereInput = date
+      ? {
+          created_at: {
+            gte: startOfMonth(date),
+            lt: endOfMonth(date),
+          },
+        }
+      : {};
 
     const categories = await db.product.findMany({
       where: {
         business_id: user.businessId,
         deleted_at: null,
         current_version: { category },
+        ...whereClause,
       },
       include: { current_version: true },
     });
@@ -120,28 +157,44 @@ export async function fetchProductCategories(category: string) {
       data: categories,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error fetching product categories: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error fetching product categories `,
+    };
   }
 }
 
-export async function fetchLowStockProducts(threshold: number) {
+export async function fetchLowStockProducts(date?: Date) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
+    const margin_value_const = await db.preferences.findFirst({
+      where: {
+        key: "threshold_margin",
+      },
+    });
+
+    const margin_value = Number(margin_value_const?.value) || 3;
+    const whereClause: Prisma.ProductWhereInput = date
+      ? {
+          created_at: {
+            gte: startOfMonth(date),
+            lt: endOfMonth(date),
+          },
+        }
+      : {};
 
     const lowStockProducts = await db.product.findMany({
       where: {
         business_id: user.businessId,
         deleted_at: null,
         current_version: {
-          stock: { lte: threshold },
+          stock: { lte: margin_value },
         },
+        ...whereClause,
       },
-      include: { current_version: true },
+      include: { current_version: true, versions: true },
       orderBy: {
         current_version: {
           stock: "asc",
@@ -155,23 +208,121 @@ export async function fetchLowStockProducts(threshold: number) {
       data: lowStockProducts,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error fetching low stock products: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error fetching low stock products `,
+    };
   }
 }
 
-export async function fetchProductStockHistory(productId: string) {
+export async function fetchInStockProducts(date?: Date) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
+    const whereClause: Prisma.ProductWhereInput = date
+      ? {
+          created_at: {
+            gte: startOfMonth(date),
+            lt: endOfMonth(date),
+          },
+        }
+      : {};
+
+    const lowStockProducts = await db.product.findMany({
+      where: {
+        business_id: user.businessId,
+        deleted_at: null,
+        current_version: {
+          stock: { gt: 0 },
+        },
+        ...whereClause,
+      },
+      include: { current_version: true, versions: true },
+      orderBy: {
+        current_version: {
+          stock: "asc",
+        },
+      },
+    });
+
+    return {
+      status: "success",
+      msg: "Low stock products fetched successfully",
+      data: lowStockProducts,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error fetching low stock products `,
+    };
+  }
+}
+
+export async function fetchOutStockProducts(date?: Date) {
+  try {
+    const user = await getAuthenticatedUser();
+    if (!user) return { status: "error", msg: "User not authenticated" };
+    const whereClause: Prisma.ProductWhereInput = date
+      ? {
+          created_at: {
+            gte: startOfMonth(date),
+            lt: endOfMonth(date),
+          },
+        }
+      : {};
+
+    const lowStockProducts = await db.product.findMany({
+      where: {
+        business_id: user.businessId,
+        deleted_at: null,
+        current_version: {
+          stock: { lte: 0 },
+        },
+        ...whereClause,
+      },
+      include: { current_version: true, versions: true },
+      orderBy: {
+        current_version: {
+          stock: "asc",
+        },
+      },
+    });
+
+    return {
+      status: "success",
+      msg: "Low stock products fetched successfully",
+      data: lowStockProducts,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error fetching low stock products `,
+    };
+  }
+}
+
+export async function fetchProductStockHistory(productId: string, date?: Date) {
+  try {
+    const user = await getAuthenticatedUser();
+    if (!user) return { status: "error", msg: "User not authenticated" };
+
+    const whereClause: Prisma.StockMovementWhereInput = date
+      ? {
+          created_at: {
+            gte: startOfMonth(date),
+            lt: endOfMonth(date),
+          },
+        }
+      : {};
 
     const stockHistory = await db.stockMovement.findMany({
       where: {
         product_id: productId,
         business_id: user.businessId,
+        ...whereClause,
       },
       orderBy: { created_at: "desc" },
       include: {
@@ -187,23 +338,33 @@ export async function fetchProductStockHistory(productId: string) {
       data: stockHistory,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error fetching product stock history: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error fetching product stock history `,
+    };
   }
 }
 
-export async function fetchProductLogHistory(productId: string) {
+export async function fetchProductLogHistory(productId: string, date?: Date) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
+
+    const whereClause: Prisma.LogWhereInput = date
+      ? {
+          created_at: {
+            gte: startOfMonth(date),
+            lt: endOfMonth(date),
+          },
+        }
+      : {};
 
     const logHistory = await db.log.findMany({
       where: {
         product_id: productId,
         business_id: user.businessId,
+        ...whereClause,
       },
       orderBy: { created_at: "desc" },
       include: {
@@ -219,141 +380,33 @@ export async function fetchProductLogHistory(productId: string) {
       data: logHistory,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error fetching product log history: ${error.message}`,
-      };
-  }
-}
-
-export async function fetchMostSoldThisMonth() {
-  try {
-    const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
-
-    const startDate = startOfMonth(new Date());
-    const endDate = endOfMonth(new Date());
-
-    const mostSoldProducts = await db.stockMovement.groupBy({
-      by: ["product_id"],
-      where: {
-        business_id: user.businessId,
-        type: "OUT",
-        created_at: {
-          gte: startDate,
-          lte: endDate,
-        },
-      },
-      _sum: {
-        quantity: true,
-      },
-      orderBy: {
-        _sum: {
-          quantity: "desc",
-        },
-      },
-      take: 5,
-    });
-
-    const productDetails = await db.product.findMany({
-      where: {
-        id: {
-          in: mostSoldProducts.map((p) => p.product_id),
-        },
-        deleted_at: null,
-      },
-      include: {
-        current_version: true,
-      },
-    });
-
-    const result = mostSoldProducts.map((mp) => {
-      const product = productDetails.find((p) => p.id === mp.product_id);
-      return {
-        id: mp.product_id,
-        name: product?.name,
-        quantity_sold: mp._sum.quantity,
-        current_stock: product?.current_version?.stock,
-      };
-    });
-
+    console.error(error);
     return {
-      status: "success",
-      msg: "Most sold products this month fetched successfully",
-      data: result,
+      status: "error",
+      msg: `Error fetching product log history `,
     };
-  } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error fetching most sold products: ${error.message}`,
-      };
   }
 }
 
-export async function fetchLeastSoldThisMonth() {
+export async function fetchProductsNearingExpiry(
+  daysThreshold: number,
+  date?: Date
+) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
-
-    const startDate = startOfMonth(new Date());
-    const endDate = endOfMonth(new Date());
-
-    const allProducts = await db.product.findMany({
-      where: { business_id: user.businessId, deleted_at: null },
-      include: { current_version: true },
-    });
-
-    const salesData = await db.stockMovement.groupBy({
-      by: ["product_id"],
-      where: {
-        business_id: user.businessId,
-        type: "OUT",
-        created_at: {
-          gte: startDate,
-          lte: endDate,
-        },
-      },
-      _sum: {
-        quantity: true,
-      },
-    });
-
-    const result = allProducts.map((product) => {
-      const sales = salesData.find((sd) => sd.product_id === product.id);
-      return {
-        id: product.id,
-        name: product.name,
-        quantity_sold: sales ? sales._sum.quantity : 0,
-        current_stock: product.current_version?.stock,
-      };
-    });
-
-    result.sort((a, b) => (a.quantity_sold ?? 0) - (b.quantity_sold ?? 0));
-    const leastSold = result.slice(0, 5);
-
-    return {
-      status: "success",
-      msg: "Least sold products this month fetched successfully",
-      data: leastSold,
-    };
-  } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error fetching least sold products: ${error.message}`,
-      };
-  }
-}
-
-export async function fetchProductsNearingExpiry(daysThreshold: number) {
-  try {
-    const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const thresholdDate = new Date();
     thresholdDate.setDate(thresholdDate.getDate() + daysThreshold);
+
+    const whereClause: Prisma.ProductWhereInput = date
+      ? {
+          created_at: {
+            gte: startOfMonth(date),
+            lt: endOfMonth(date),
+          },
+        }
+      : {};
 
     const productsNearingExpiry = await db.product.findMany({
       where: {
@@ -367,6 +420,7 @@ export async function fetchProductsNearingExpiry(daysThreshold: number) {
             },
           },
         },
+        ...whereClause,
       },
       include: { versions: true },
       orderBy: {
@@ -380,18 +434,18 @@ export async function fetchProductsNearingExpiry(daysThreshold: number) {
       data: productsNearingExpiry,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error fetching products nearing expiry: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error fetching products nearing expiry `,
+    };
   }
 }
 
 export async function fetchProductPerformanceComparison(productId: string) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const currentMonth = new Date();
     const lastMonth = subMonths(currentMonth, 1);
@@ -443,10 +497,10 @@ export async function fetchProductPerformanceComparison(productId: string) {
       },
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error fetching product performance comparison: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error fetching product performance comparison `,
+    };
   }
 }

@@ -1,7 +1,7 @@
 "use server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { AuthResponse } from "@/types";
+import { AuthResponse } from "@/auth-types";
 import { z } from "zod";
 import { OnboardingJoinSchema } from "@/components/onboarding/onboarding-join";
 

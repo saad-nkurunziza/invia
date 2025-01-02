@@ -61,11 +61,11 @@ export async function addUser(user: User, businessId: string) {
 
     return newUser;
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error adding user: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error adding user `,
+    };
   }
 }
 
@@ -118,11 +118,11 @@ export async function editUser(userId: string, userData: Partial<User>) {
 
     return updatedUser;
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error updating user: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error updating user `,
+    };
   }
 }
 
@@ -172,10 +172,10 @@ export async function deleteUser(userId: string) {
 
     return result;
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Failed to delete user: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Failed to delete user `,
+    };
   }
 }

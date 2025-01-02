@@ -2,15 +2,14 @@ import { db } from "@/lib/db";
 import { getAuthenticatedUser } from "@/server/auth";
 import { startOfMonth, subMonths, endOfMonth } from "date-fns";
 
-const now = new Date();
-const startOfThisMonth = startOfMonth(now);
-const startOfLastMonth = startOfMonth(subMonths(now, 1));
-const endOfLastMonth = endOfMonth(subMonths(now, 1));
-
-export const stockComparedToLastMonth = async () => {
+export const stockComparedToLastMonth = async (date: Date = new Date()) => {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
+
+    const startOfThisMonth = startOfMonth(date);
+    const startOfLastMonth = startOfMonth(subMonths(date, 1));
+    const endOfLastMonth = endOfMonth(subMonths(date, 1));
 
     const [lastMonthPurchases, thisMonthPurchases] = await Promise.all([
       db.stockMovement.findMany({
@@ -56,18 +55,22 @@ export const stockComparedToLastMonth = async () => {
       difference: totalPurchaseThisMonth - totalPurchaseLastMonth,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error comparing stock: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error comparing stock `,
+    };
   }
 };
 
-export const revenueComparedToLastMonth = async () => {
+export const revenueComparedToLastMonth = async (date = new Date()) => {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
+
+    const startOfThisMonth = startOfMonth(date);
+    const startOfLastMonth = startOfMonth(subMonths(date, 1));
+    const endOfLastMonth = endOfMonth(subMonths(date, 1));
 
     const [lastMonthSales, thisMonthSales] = await Promise.all([
       db.stockMovement.findMany({
@@ -115,18 +118,22 @@ export const revenueComparedToLastMonth = async () => {
       difference: totalSalesThisMonth - totalSalesLastMonth,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error comparing stock: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error comparing stock `,
+    };
   }
 };
 
-export const salesComparedToLastMonth = async () => {
+export const salesComparedToLastMonth = async (date = new Date()) => {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
+
+    const startOfThisMonth = startOfMonth(date);
+    const startOfLastMonth = startOfMonth(subMonths(date, 1));
+    const endOfLastMonth = endOfMonth(subMonths(date, 1));
 
     const [currentMonthSales, lastMonthSales] = await Promise.all([
       db.stockMovement.aggregate({
@@ -165,18 +172,22 @@ export const salesComparedToLastMonth = async () => {
       difference: currentMonthSalesQty - lastMonthSalesQty,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error comparing stock: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error comparing stock `,
+    };
   }
 };
 
-export const profitsComparedToLastMonth = async () => {
+export const profitsComparedToLastMonth = async (date = new Date()) => {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
+
+    const startOfThisMonth = startOfMonth(date);
+    const startOfLastMonth = startOfMonth(subMonths(date, 1));
+    const endOfLastMonth = endOfMonth(subMonths(date, 1));
 
     const [lastMonthSales, lastMonthPurchases] = await Promise.all([
       db.stockMovement.findMany({
@@ -277,10 +288,10 @@ export const profitsComparedToLastMonth = async () => {
       difference: profitThisMonth - profitLastMonth,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error comparing stock: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error comparing stock `,
+    };
   }
 };

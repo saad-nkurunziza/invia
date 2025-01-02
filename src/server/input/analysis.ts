@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 export async function integrateMonthlyStockValue() {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const now = new Date();
     const year = now.getFullYear();
@@ -83,18 +83,18 @@ export async function integrateMonthlyStockValue() {
 
     return result;
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error integrating monthly stock value: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error integrating monthly stock value `,
+    };
   }
 }
 
 export async function getMonthlyStockValues(months: number) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const endDate = new Date();
     const startDate = new Date(endDate);
@@ -120,11 +120,11 @@ export async function getMonthlyStockValues(months: number) {
       data: stockValues,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error retrieving monthly stock values: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error retrieving monthly stock values `,
+    };
   }
 }
 
@@ -134,7 +134,7 @@ export async function getTopSellingProducts(
 ) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const endDate = new Date();
     const startDate = new Date(endDate);
@@ -198,10 +198,10 @@ export async function getTopSellingProducts(
       data: result,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error retrieving top selling products: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error retrieving top selling products `,
+    };
   }
 }

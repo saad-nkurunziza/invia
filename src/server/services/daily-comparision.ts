@@ -2,15 +2,14 @@ import { db } from "@/lib/db";
 import { getAuthenticatedUser } from "@/server/auth";
 import { startOfDay, subDays, endOfDay } from "date-fns";
 
-const now = new Date();
-const startOfToday = startOfDay(now);
-const startOfYesterday = startOfDay(subDays(now, 1));
-const endOfYesterday = endOfDay(subDays(now, 1));
+export const stockComparedToLastDay = async (date: Date = new Date()) => {
+  const startOfToday = startOfDay(date);
+  const startOfYesterday = startOfDay(subDays(date, 1));
+  const endOfYesterday = endOfDay(subDays(date, 1));
 
-export const stockComparedToLastDay = async () => {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const [yesterdayPurchases, todayPurchases] = await Promise.all([
       db.stockMovement.findMany({
@@ -56,18 +55,22 @@ export const stockComparedToLastDay = async () => {
       difference: totalPurchaseToday - totalPurchaseYesterday,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error comparing stock: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error comparing stock `,
+    };
   }
 };
 
-export const revenueComparedToLastDay = async () => {
+export const revenueComparedToLastDay = async (date: Date = new Date()) => {
+  const startOfToday = startOfDay(date);
+  const startOfYesterday = startOfDay(subDays(date, 1));
+  const endOfYesterday = endOfDay(subDays(date, 1));
+
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const [yesterdaySales, todaySales] = await Promise.all([
       db.stockMovement.findMany({
@@ -115,18 +118,22 @@ export const revenueComparedToLastDay = async () => {
       difference: totalSalesToday - totalSalesYesterday,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error comparing stock: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error comparing stock `,
+    };
   }
 };
 
-export const salesComparedToLastDay = async () => {
+export const salesComparedToLastDay = async (date: Date = new Date()) => {
+  const startOfToday = startOfDay(date);
+  const startOfYesterday = startOfDay(subDays(date, 1));
+  const endOfYesterday = endOfDay(subDays(date, 1));
+
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const [currentDaySales, lastDaySales] = await Promise.all([
       db.stockMovement.aggregate({
@@ -165,18 +172,22 @@ export const salesComparedToLastDay = async () => {
       difference: currentDaySalesQty - lastDaySalesQty,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error comparing stock: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error comparing stock `,
+    };
   }
 };
 
-export const profitsComparedToLastDay = async () => {
+export const profitsComparedToLastDay = async (date: Date = new Date()) => {
+  const startOfToday = startOfDay(date);
+  const startOfYesterday = startOfDay(subDays(date, 1));
+  const endOfYesterday = endOfDay(subDays(date, 1));
+
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const [yesterdaySales, yesterdayPurchases] = await Promise.all([
       db.stockMovement.findMany({
@@ -274,10 +285,10 @@ export const profitsComparedToLastDay = async () => {
       difference: profitToday - profitYesterday,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error comparing stock: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error comparing stock `,
+    };
   }
 };

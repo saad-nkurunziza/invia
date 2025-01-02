@@ -7,7 +7,7 @@ export default auth((req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
 
-  console.log("Middleware auth:", req.auth);
+  "Middleware auth:", req.auth;
 
   const isApiAuthRoute = nextUrl.pathname.startsWith(routes.apiAuthPrefix);
   const isPublicRoute = routes.publicRoutes.includes(nextUrl.pathname);

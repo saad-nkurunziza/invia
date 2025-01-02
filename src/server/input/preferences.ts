@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 export async function saveStockName(stockName: string) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const result = await db.$transaction(async (tx) => {
       const updatedSetting = await tx.preferences.upsert({
@@ -51,18 +51,18 @@ export async function saveStockName(stockName: string) {
 
     return result;
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error saving stock name: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error saving stock name `,
+    };
   }
 }
 
 export async function saveThresholdMargin(thresholdMargin: string) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const result = await db.$transaction(async (tx) => {
       const updatedSetting = await tx.preferences.upsert({
@@ -107,18 +107,18 @@ export async function saveThresholdMargin(thresholdMargin: string) {
 
     return result;
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error saving threshold margin: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error saving threshold margin `,
+    };
   }
 }
 
 export async function getPreferences() {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const preferences = await db.preferences.findMany({
       where: {
@@ -132,10 +132,10 @@ export async function getPreferences() {
       data: preferences,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error retrieving preferences: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error retrieving preferences `,
+    };
   }
 }

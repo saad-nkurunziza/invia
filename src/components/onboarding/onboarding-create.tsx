@@ -31,11 +31,9 @@ export const OnboardingCreateSchema = z.object({
     .string()
     .min(10, { message: "Business phone must be at least 10 characters long" })
     .optional(),
-  registrationNumber: z
-    .string()
-    .min(4, {
-      message: "Registration number has to have a minimum of 4 characters",
-    }),
+  registrationNumber: z.string().min(4, {
+    message: "Registration number has to have a minimum of 4 characters",
+  }),
   address: z
     .string()
     .min(4, { message: "Address has to have a minimum of 4 characters" }),
@@ -66,7 +64,7 @@ const OnboardingCreateForm = () => {
   const { isSubmitting } = form.formState;
 
   const onSubmit = async (values: OnboardingCreateFormValues) => {
-    console.log(values);
+    values;
     try {
       const response = await create(values);
 

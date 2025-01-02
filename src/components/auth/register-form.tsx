@@ -12,7 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { RegisterSchema } from "@/types";
+import { RegisterSchema } from "@/auth-types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { register } from "@/server/auth/register";

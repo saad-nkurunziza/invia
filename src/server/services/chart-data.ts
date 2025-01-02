@@ -4,7 +4,7 @@ import { getAuthenticatedUser } from "@/server/auth";
 export const getSalesStatistics = async () => {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const recentSales = await db.stockMovement.findMany({
       where: {
@@ -30,25 +30,29 @@ export const getSalesStatistics = async () => {
         },
       },
     });
-
-    return recentSales.map((sale) => ({
+    const result = recentSales.map((sale) => ({
       date: sale.created_at.toISOString().split("T")[0],
       value: sale.quantity * +sale.product.versions[0].selling_price,
       name: sale.product.versions[0].name,
     }));
+    return {
+      status: "success",
+      msg: "Supplier added successfully",
+      data: result,
+    };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error comparing stock: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error comparing stock `,
+    };
   }
 };
 
 export const getPurchaseStatistics = async () => {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const recentPurchases = await db.stockMovement.findMany({
       where: {
@@ -75,16 +79,21 @@ export const getPurchaseStatistics = async () => {
       },
     });
 
-    return recentPurchases.map((purchase) => ({
+    const result = recentPurchases.map((purchase) => ({
       date: purchase.created_at.toISOString().split("T")[0],
       value: purchase.quantity * +purchase.product.versions[0].buying_price,
       name: purchase.product.versions[0].name,
     }));
+    return {
+      status: "success",
+      msg: "Supplier added successfully",
+      data: result,
+    };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error comparing stock: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error comparing stock `,
+    };
   }
 };

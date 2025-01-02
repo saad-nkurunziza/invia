@@ -1,28 +1,35 @@
 "use server";
+
 import { db } from "@/lib/db";
 import { getAuthenticatedUser } from "@/server/auth";
-import { Log } from "@prisma/client";
+import type { Log } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { startOfMonth, endOfMonth } from "date-fns";
 
-export async function fetchLogs(limit: number = 50, offset: number = 0) {
+export async function fetchLogs(date?: Date) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
+
+    const whereClause: Prisma.LogWhereInput = date
+      ? {
+          created_at: {
+            gte: startOfMonth(date),
+            lt: endOfMonth(date),
+          },
+        }
+      : {};
 
     const logs = await db.log.findMany({
-      where: { business_id: user.businessId },
+      where: {
+        business_id: user.businessId,
+        ...whereClause,
+      },
       orderBy: { created_at: "desc" },
-      take: limit,
-      skip: offset,
       include: {
-        user: {
-          select: { name: true },
-        },
-        product: {
-          select: { name: true },
-        },
-        supplier: {
-          select: { name: true },
-        },
+        user: true,
+        product: true,
+        supplier: true,
       },
     });
 
@@ -32,23 +39,32 @@ export async function fetchLogs(limit: number = 50, offset: number = 0) {
       data: logs,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error fetching logs: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error fetching logs `,
+    };
   }
 }
 
-export async function fetchLogsByType(type: Log["type"]) {
+export async function fetchLogsByType(type: Log["type"], date?: Date) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
+    const whereClause: Prisma.LogWhereInput = date
+      ? {
+          created_at: {
+            gte: startOfMonth(date),
+            lt: endOfMonth(date),
+          },
+        }
+      : {};
     const logs = await db.log.findMany({
       where: {
         type: type,
         business_id: user.businessId,
+        ...whereClause,
       },
       orderBy: { created_at: "desc" },
       include: {
@@ -70,10 +86,10 @@ export async function fetchLogsByType(type: Log["type"]) {
       data: logs,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error fetching logs: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error fetching logs `,
+    };
   }
 }

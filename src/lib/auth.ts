@@ -26,16 +26,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     //   }
     //   return true;
     // },
-    async session({ session, token, user }) {
-      console.log("Session callback:", { session, token, user });
+    async session({ session, token }) {
+      "Session callback:", { session, token };
       if (token.sub && session.user) {
         const existingUser = await getUserById(token.sub);
+        ({ existingUser });
         session.user.id = token.sub;
         session.user.businessId =
-          existingUser?.businesses[0].business_id ?? undefined;
+          existingUser?.businesses?.[0]?.business_id ?? undefined;
         session.user.role = existingUser?.role;
       }
-      console.log("Updated session:", session);
+      "Updated session:", session;
       return session;
     },
     async jwt({ token }) {

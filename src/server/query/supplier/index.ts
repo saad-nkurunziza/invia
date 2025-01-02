@@ -1,15 +1,30 @@
 "use server";
 import { db } from "@/lib/db";
 import { getAuthenticatedUser } from "@/server/auth";
+import { Prisma } from "@prisma/client";
+import { startOfMonth, endOfMonth } from "date-fns";
 
-export async function fetchSuppliers() {
+export async function fetchSuppliers(date?: Date) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
+
+    const whereClause: Prisma.SupplierWhereInput = date
+      ? {
+          created_at: {
+            gte: startOfMonth(date),
+            lt: endOfMonth(date),
+          },
+        }
+      : {};
 
     const suppliers = await db.supplier.findMany({
-      where: { business_id: user.businessId, deleted_at: null },
-      orderBy: { created_at: "desc" },
+      where: {
+        business_id: user.businessId,
+        deleted_at: null,
+        ...whereClause,
+      },
+      orderBy: { updated_at: "desc" },
     });
 
     return {
@@ -18,18 +33,18 @@ export async function fetchSuppliers() {
       data: suppliers,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error fetching suppliers: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error fetching suppliers`,
+    };
   }
 }
 
 export async function fetchSupplierById(supplierId: string) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
     const supplier = await db.supplier.findUnique({
       where: {
@@ -53,21 +68,34 @@ export async function fetchSupplierById(supplierId: string) {
       data: supplier,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error fetching supplier: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error fetching supplier`,
+    };
   }
 }
 
-export async function fetchPopularSuppliers() {
+export async function fetchPopularSuppliers(date?: Date) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
+
+    const whereClause: Prisma.SupplierWhereInput = date
+      ? {
+          created_at: {
+            gte: startOfMonth(date),
+            lt: endOfMonth(date),
+          },
+        }
+      : {};
 
     const suppliers = await db.supplier.findMany({
-      where: { business_id: user.businessId, deleted_at: null },
+      where: {
+        business_id: user.businessId,
+        deleted_at: null,
+        ...whereClause,
+      },
       include: {
         products: {
           include: {
@@ -103,21 +131,34 @@ export async function fetchPopularSuppliers() {
       data: suppliers,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error fetching and sorting suppliers: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error fetching and sorting suppliers`,
+    };
   }
 }
 
-export async function fetchLatestSuppliers() {
+export async function fetchLatestSuppliers(date?: Date) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { error: "User not authenticated" };
+    if (!user) return { status: "error", msg: "User not authenticated" };
+
+    const whereClause: Prisma.SupplierWhereInput = date
+      ? {
+          created_at: {
+            gte: startOfMonth(date),
+            lt: endOfMonth(date),
+          },
+        }
+      : {};
 
     const suppliers = await db.supplier.findMany({
-      where: { business_id: user.businessId, deleted_at: null },
+      where: {
+        business_id: user.businessId,
+        deleted_at: null,
+        ...whereClause,
+      },
       orderBy: { updated_at: "desc" },
     });
 
@@ -127,10 +168,10 @@ export async function fetchLatestSuppliers() {
       data: suppliers,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return {
-        status: "error",
-        msg: `Error fetching suppliers: ${error.message}`,
-      };
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error fetching suppliers`,
+    };
   }
 }
