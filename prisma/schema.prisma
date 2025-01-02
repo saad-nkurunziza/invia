@@ -23,6 +23,7 @@ enum Currency {
   USD
   EUR
   GBP
+  RWF
 }
 
 enum LogType {
@@ -58,7 +59,7 @@ model Business {
   products            Product[]
   suppliers           Supplier[]
   logs                Log[]
-  preferences         Preferences[]
+  preferences         Preference[]
   analysis_stats      AnalysisStats[]
   transactions        StockMovement[]
   created_at          DateTime        @default(now())
@@ -89,7 +90,6 @@ model User {
 }
 
 model BusinessUser {
-  id          String    @id @default(cuid())
   user        User      @relation(fields: [user_id], references: [id])
   user_id     String
   business    Business  @relation(fields: [business_id], references: [id])
@@ -98,7 +98,9 @@ model BusinessUser {
   last_access DateTime  @updatedAt
   deleted_at  DateTime?
 
-  @@unique([user_id, business_id])
+  @@id([user_id, business_id])
+  @@index([business_id])
+  @@index([user_id])
   @@map("business_users")
 }
 
@@ -131,8 +133,8 @@ model ProductVersion {
   name                String
   stock               Int           @db.Integer
   description         String?
-  buying_price        Decimal       @db.Decimal(10, 2)
-  selling_price       Decimal       @db.Decimal(10, 2)
+  buying_price        Int           @db.Integer
+  selling_price       Int           @db.Integer
   status              ProductStatus @default(ACTIVE)
   threshold           Int           @db.Integer
   category            String?
@@ -147,6 +149,7 @@ model ProductVersion {
 
   @@unique([product_id, version_id])
   @@index([product_id, created_at])
+  @@map("product_versions")
 }
 
 model Supplier {
@@ -163,6 +166,8 @@ model Supplier {
   updated_at       DateTime         @updatedAt
   deleted_at       DateTime?
   product_versions ProductVersion[]
+
+  @@map("suppliers")
 }
 
 // Operational models
@@ -199,7 +204,7 @@ model Log {
 }
 
 // Configuration and analysis models
-model Preferences {
+model Preference {
   id          String   @id @default(cuid())
   key         String
   value       String
@@ -209,6 +214,7 @@ model Preferences {
   updated_at  DateTime @updatedAt
 
   @@unique([key, business_id])
+  @@map("preferences")
 }
 
 model AnalysisStats {
@@ -221,6 +227,7 @@ model AnalysisStats {
   updated_at  DateTime @updatedAt
 
   @@unique([key, business_id, created_at])
+  @@map("analysis_stats")
 }
 
 // Authentication models

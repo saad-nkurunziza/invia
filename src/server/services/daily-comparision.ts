@@ -49,10 +49,14 @@ export const stockComparedToLastDay = async (date: Date = new Date()) => {
       0
     );
 
+    const result = {
+      current: totalPurchaseToday,
+      last: totalPurchaseYesterday,
+    };
     return {
-      currentDayStock: totalPurchaseToday,
-      lastDayStock: totalPurchaseYesterday,
-      difference: totalPurchaseToday - totalPurchaseYesterday,
+      status: "success",
+      msg: "Daily purchase comparision retrieved successfully",
+      data: result,
     };
   } catch (error) {
     console.error(error);
@@ -112,10 +116,14 @@ export const revenueComparedToLastDay = async (date: Date = new Date()) => {
     const totalSalesToday = todaySales.reduce((total, sale) => {
       return total + sale.quantity * +sale.product.versions[0].selling_price;
     }, 0);
+    const result = {
+      current: totalSalesToday,
+      last: totalSalesYesterday,
+    };
     return {
-      currentDayRevenue: totalSalesToday,
-      lastDayRevenue: totalSalesYesterday,
-      difference: totalSalesToday - totalSalesYesterday,
+      status: "success",
+      msg: "Daily sales comparision retrieved successfully",
+      data: result,
     };
   } catch (error) {
     console.error(error);
@@ -166,10 +174,14 @@ export const salesComparedToLastDay = async (date: Date = new Date()) => {
     const currentDaySalesQty = currentDaySales._sum.quantity ?? 0;
     const lastDaySalesQty = lastDaySales._sum.quantity ?? 0;
 
+    const result = {
+      current: currentDaySalesQty,
+      last: lastDaySalesQty,
+    };
     return {
-      currentDaySales: currentDaySalesQty,
-      lastDaySales: lastDaySalesQty,
-      difference: currentDaySalesQty - lastDaySalesQty,
+      status: "success",
+      msg: "Daily sales quantity comparision retrieved successfully",
+      data: result,
     };
   } catch (error) {
     console.error(error);
@@ -279,10 +291,14 @@ export const profitsComparedToLastDay = async (date: Date = new Date()) => {
 
     const profitYesterday = totalSalesYesterday - totalPurchaseYesterday;
     const profitToday = totalSalesToday - totalPurchaseToday;
+    const result = {
+      current: profitToday,
+      last: profitYesterday,
+    };
     return {
-      currentDayProfit: profitToday,
-      lastDayProfit: profitYesterday,
-      difference: profitToday - profitYesterday,
+      status: "success",
+      msg: "Daily sale capacity comparision retrieved successfully",
+      data: result,
     };
   } catch (error) {
     console.error(error);

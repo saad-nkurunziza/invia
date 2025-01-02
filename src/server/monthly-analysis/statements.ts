@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { getAuthenticatedUser } from "@/server/auth";
 import { startOfMonth, endOfMonth, addMonths } from "date-fns";
 
-export async function getMostSoldProduct(date: Date) {
+export async function getMostSoldProducts(date: Date) {
   try {
     const user = await getAuthenticatedUser();
     if (!user) return { status: "error", msg: "User not authenticated" };
@@ -10,7 +10,7 @@ export async function getMostSoldProduct(date: Date) {
     const startOfThisMonth = startOfMonth(date);
     const endOfThisMonth = endOfMonth(date);
 
-    const mostSoldProduct = await db.stockMovement.groupBy({
+    const mostSoldProducts = await db.stockMovement.groupBy({
       by: ["product_id"],
       where: {
         business_id: user.businessId,
@@ -28,38 +28,47 @@ export async function getMostSoldProduct(date: Date) {
           quantity: "desc",
         },
       },
-      take: 1,
+      take: 4,
     });
-    if (mostSoldProduct.length === 0 || !mostSoldProduct[0].product_id) {
+
+    if (!mostSoldProducts.length || !mostSoldProducts[0].product_id) {
       return {
-        productName: "No Product Data Available",
-        quantity: 0,
+        status: "success",
+        msg: "No product data available",
+        data: {
+          mostSoldProducts: [
+            {
+              productName: "No Product Data Available",
+              quantity: 0,
+            },
+          ],
+        },
       };
     }
-    const product = await db.product.findUnique({
-      where: {
-        id: mostSoldProduct[0].product_id,
-      },
-      select: {
-        name: true,
-      },
-    });
+
+    const products = await Promise.all(
+      mostSoldProducts.map(async (product) => {
+        const productDetails = await db.product.findUnique({
+          where: { id: product.product_id },
+          select: { name: true },
+        });
+        return {
+          productName: productDetails?.name || "Unknown Product",
+          quantity: product._sum.quantity || 0,
+        };
+      })
+    );
 
     return {
       status: "success",
-      msg: "Purchase stock value calculated successfully",
-      data: {
-        mostSoldProduct: {
-          productName: product?.name || "Unknown Product",
-          qty: mostSoldProduct[0]._sum.quantity || 0,
-        },
-      },
+      msg: "Most sold products retrieved successfully",
+      data: products,
     };
   } catch (error) {
     console.error(error);
     return {
       status: "error",
-      msg: `Error calculating purchase stock value `,
+      msg: "Error calculating most sold products",
     };
   }
 }

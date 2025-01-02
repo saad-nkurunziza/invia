@@ -5,11 +5,11 @@ import type { NextAuthConfig } from "next-auth";
 import { LoginSchema } from "@/auth-types";
 import { getUserByEmail } from "@/server/user";
 
-export default {
+export const authConfig: NextAuthConfig = {
   providers: [
     Github({
-      clientId: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      clientId: process.env.GITHUB_CLIENT_ID as string,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
     }),
     Credentials({
       async authorize(credentials) {
@@ -34,4 +34,4 @@ export default {
       },
     }),
   ],
-} satisfies NextAuthConfig;
+};

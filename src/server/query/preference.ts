@@ -1,16 +1,16 @@
 import { db } from "@/lib/db";
 import { getAuthenticatedUser } from "@/server/auth";
-import type { Preferences } from "@prisma/client";
+import type { Preference } from "@prisma/client";
 export async function fetchPreferences(): Promise<{
   status: string;
   msg: string;
-  data?: Preferences[];
+  data?: Preference[];
 }> {
   try {
     const user = await getAuthenticatedUser();
     if (!user) return { status: "error", msg: "User not authenticated" };
 
-    const preferences = await db.preferences.findMany({
+    const preferences = await db.preference.findMany({
       where: { business_id: user.businessId },
     });
 

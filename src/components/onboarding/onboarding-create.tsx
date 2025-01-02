@@ -64,7 +64,6 @@ const OnboardingCreateForm = () => {
   const { isSubmitting } = form.formState;
 
   const onSubmit = async (values: OnboardingCreateFormValues) => {
-    values;
     try {
       const response = await create(values);
 
@@ -85,132 +84,141 @@ const OnboardingCreateForm = () => {
 
   return (
     <Form {...form}>
-      <OnboardingBackButton />
-      <div className="py-3 space-y-3">
-        <CardTitle>Create your business</CardTitle>
-        <CardDescription>
-          Please provide the necessary details to set up your business. This
-          information will help us create your account and get you started on
-          the right foot.
-        </CardDescription>
+      <div className="p-6 space-y-6">
+        <OnboardingBackButton />
+        <div className="space-y-2">
+          <CardTitle className="text-2xl font-semibold">
+            Create Business
+          </CardTitle>
+          <CardDescription className="text-muted-foreground">
+            Enter your business details to get started.
+          </CardDescription>
+        </div>
+        <FormDescriptionMessage type={messageType} message={formMessage} />
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="businessName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="businessName">Business Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      variant={"lg"}
+                      type="text"
+                      id="businessName"
+                      placeholder="Enter your business name"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="businessEmail"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="businessEmail">Business Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      variant={"lg"}
+                      type="email"
+                      id="businessEmail"
+                      placeholder="Enter business email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="businessPhone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="businessPhone">Business Phone</FormLabel>
+                  <FormControl>
+                    <Input
+                      variant={"lg"}
+                      type="tel"
+                      id="businessPhone"
+                      placeholder="Enter business phone"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="registrationNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="registrationNumber">
+                    Registration number
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      variant={"lg"}
+                      type="tel"
+                      id="registrationNumber"
+                      placeholder="Enter registration number"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="address">Address</FormLabel>
+                  <FormControl>
+                    <Input
+                      variant={"lg"}
+                      type="tel"
+                      id="address"
+                      placeholder="Enter address"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="isAdmin"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>I am an admin of this business</FormLabel>
+                  </div>
+                </FormItem>
+              )}
+            />
+          </div>
+          <ContinueButton
+            isSubmitting={isSubmitting}
+            title="Create Business"
+            // className="w-full mt-6"
+          />
+        </form>
       </div>
-      <FormDescriptionMessage type={messageType} message={formMessage} />
-      <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
-          control={form.control}
-          name="businessName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel htmlFor="businessName">Business Name</FormLabel>
-              <FormControl>
-                <Input
-                  type="text"
-                  id="businessName"
-                  placeholder="Enter your business name"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="businessEmail"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel htmlFor="businessEmail">Business Email</FormLabel>
-              <FormControl>
-                <Input
-                  type="email"
-                  id="businessEmail"
-                  placeholder="Enter business email"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="businessPhone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel htmlFor="businessPhone">Business Phone</FormLabel>
-              <FormControl>
-                <Input
-                  type="tel"
-                  id="businessPhone"
-                  placeholder="Enter business phone"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="registrationNumber"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel htmlFor="registrationNumber">
-                Registration number
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="tel"
-                  id="registrationNumber"
-                  placeholder="Enter registration number"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel htmlFor="address">Address</FormLabel>
-              <FormControl>
-                <Input
-                  type="tel"
-                  id="address"
-                  placeholder="Enter address"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="isAdmin"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel>I am an admin of this business</FormLabel>
-              </div>
-            </FormItem>
-          )}
-        />
-
-        <ContinueButton
-          isSubmitting={isSubmitting}
-          title="Complete Onboarding"
-        />
-      </form>
     </Form>
   );
 };

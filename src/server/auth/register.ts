@@ -11,7 +11,7 @@ export const register = async (
   values: z.infer<typeof RegisterSchema>
 ): Promise<AuthResponse> => {
   const { email, password, name } = values;
-  ({ values });
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {

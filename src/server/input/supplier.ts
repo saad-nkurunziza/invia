@@ -1,5 +1,5 @@
 "use server";
-import { CreateSupplierFormSchema } from "@/components/input/create-supplier-form";
+import { EntrySupplierFormSchema } from "@/components/input/create-supplier-form";
 import { db } from "@/lib/db";
 import { getAuthenticatedUser } from "@/server/auth";
 import type { Supplier } from "@prisma/client";
@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 export async function addSupplier(
-  supplier: z.infer<typeof CreateSupplierFormSchema>
+  supplier: z.infer<typeof EntrySupplierFormSchema>
 ) {
   try {
     const user = await getAuthenticatedUser();

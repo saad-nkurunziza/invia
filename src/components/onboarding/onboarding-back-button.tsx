@@ -13,8 +13,14 @@ const OnboardingBackButton = () => {
 
   return (
     <div className="mb-3">
-      <Button onClick={handleBack} variant={"outline"} size={"icon"}>
+      <Button
+        onClick={handleBack}
+        variant="ghost"
+        size="sm"
+        className="gap-2 mb-2"
+      >
         <ChevronLeftIcon className="h-4 w-4" />
+        Back
       </Button>
     </div>
   );

@@ -10,7 +10,7 @@ export const join = async (
 ): Promise<AuthResponse> => {
   try {
     const session = await auth();
-    if (!session || !session.user) {
+    if (!session || !session.user || !session.user.id) {
       return { error: "Unauthorized" };
     }
 
@@ -26,7 +26,16 @@ export const join = async (
 
     await db.user.update({
       where: { id: session.user.id },
-      data: { businesses: { connect: { id: businessId } } },
+      data: {
+        businesses: {
+          connect: {
+            user_id_business_id: {
+              user_id: session.user.id,
+              business_id: businessId,
+            },
+          },
+        },
+      },
     });
     return { success: "Joined business successfully" };
   } catch (error) {

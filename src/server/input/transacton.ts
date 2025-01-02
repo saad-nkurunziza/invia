@@ -44,6 +44,7 @@ export async function deductProductQuantity(
           stock: {
             decrement: quantity,
           },
+          status: "ACTIVE",
         },
       });
 

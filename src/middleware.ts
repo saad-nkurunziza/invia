@@ -1,13 +1,11 @@
 import NextAuth from "next-auth";
-import authConfig from "@/auth.config";
+import { authConfig } from "@/auth.config";
 import * as routes from "@/routes";
 const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
-
-  "Middleware auth:", req.auth;
 
   const isApiAuthRoute = nextUrl.pathname.startsWith(routes.apiAuthPrefix);
   const isPublicRoute = routes.publicRoutes.includes(nextUrl.pathname);

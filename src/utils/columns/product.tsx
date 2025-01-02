@@ -3,6 +3,7 @@ import { DataTableColumnHeader } from "@/components/table/table-tools";
 import { ProductVersion } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import { ProductTypes } from "../types";
+import { format } from "date-fns";
 
 export const productColumns: ColumnDef<ProductTypes>[] = [
   {
@@ -12,14 +13,16 @@ export const productColumns: ColumnDef<ProductTypes>[] = [
     ),
   },
   {
-    accessorKey: "current_version.price",
+    accessorKey: "current_version.buying_price",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Price" />
+      <DataTableColumnHeader column={column} title="Buying price" />
     ),
-    cell: ({ row }) => {
-      const price = row.getValue("current_version.price") as number;
-      return <div>${price.toFixed(2)}</div>;
-    },
+  },
+  {
+    accessorKey: "current_version.selling_price",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Selling price" />
+    ),
   },
   {
     accessorKey: "current_version.stock",
@@ -34,7 +37,7 @@ export const productColumns: ColumnDef<ProductTypes>[] = [
     ),
     cell: ({ row }) => {
       const date = row.getValue("created_at") as Date;
-      return <div>{date.toLocaleDateString()}</div>;
+      return <div>{format(date, "d MMM")}</div>;
     },
   },
   {

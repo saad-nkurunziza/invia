@@ -49,10 +49,14 @@ export const stockComparedToLastMonth = async (date: Date = new Date()) => {
       0
     );
 
+    const result = {
+      current: totalPurchaseThisMonth,
+      last: totalPurchaseLastMonth,
+    };
     return {
-      currentMonthStock: totalPurchaseThisMonth,
-      lastMonthStock: totalPurchaseLastMonth,
-      difference: totalPurchaseThisMonth - totalPurchaseLastMonth,
+      status: "success",
+      msg: "Monthly purchase comparision retrieved successfully",
+      data: result,
     };
   } catch (error) {
     console.error(error);
@@ -112,10 +116,14 @@ export const revenueComparedToLastMonth = async (date = new Date()) => {
     const totalSalesThisMonth = thisMonthSales.reduce((total, sale) => {
       return total + sale.quantity * +sale.product.versions[0].selling_price;
     }, 0);
+    const result = {
+      current: totalSalesThisMonth,
+      last: totalSalesLastMonth,
+    };
     return {
-      currentMonthRevenue: totalSalesThisMonth,
-      lastMonthRevenue: totalSalesLastMonth,
-      difference: totalSalesThisMonth - totalSalesLastMonth,
+      status: "success",
+      msg: "Monthly sales comparision retrieved successfully",
+      data: result,
     };
   } catch (error) {
     console.error(error);
@@ -166,10 +174,14 @@ export const salesComparedToLastMonth = async (date = new Date()) => {
     const currentMonthSalesQty = currentMonthSales._sum.quantity ?? 0;
     const lastMonthSalesQty = lastMonthSales._sum.quantity ?? 0;
 
+    const result = {
+      current: currentMonthSalesQty,
+      last: lastMonthSalesQty,
+    };
     return {
-      currentMonthSales: currentMonthSalesQty,
-      lastMonthSales: lastMonthSalesQty,
-      difference: currentMonthSalesQty - lastMonthSalesQty,
+      status: "success",
+      msg: "Monthly sales quantity comparision retrieved successfully",
+      data: result,
     };
   } catch (error) {
     console.error(error);
@@ -282,10 +294,14 @@ export const profitsComparedToLastMonth = async (date = new Date()) => {
 
     const profitLastMonth = totalSalesLastMonth - totalPurchaseLastMonth;
     const profitThisMonth = totalSalesThisMonth - totalPurchaseThisMonth;
+    const result = {
+      current: profitThisMonth,
+      last: profitLastMonth,
+    };
     return {
-      currentMonthProfit: profitThisMonth,
-      lastMonthProfit: profitLastMonth,
-      difference: profitThisMonth - profitLastMonth,
+      status: "success",
+      msg: "Monthly sale capacity comparision retrieved successfully",
+      data: result,
     };
   } catch (error) {
     console.error(error);

@@ -9,7 +9,6 @@ export const create = async (
   values: z.infer<typeof OnboardingCreateSchema>
 ): Promise<AuthResponse> => {
   const session = await auth();
-   (session);
   if (!session || !session.user) {
     return { error: "Unauthorized" };
   }
@@ -25,7 +24,6 @@ export const create = async (
 
   try {
     await db.$transaction(async (tx) => {
-      // Create a new business
       const newBusiness = await tx.business.create({
         data: {
           name: businessName,

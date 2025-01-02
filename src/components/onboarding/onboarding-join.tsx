@@ -45,7 +45,6 @@ const OnboardingJoinForm = () => {
   const { isSubmitting } = form.formState;
 
   const onSubmit = async (values: OnboardingJoinFormValues) => {
-    values;
     try {
       const response = await join(values);
 
@@ -66,40 +65,44 @@ const OnboardingJoinForm = () => {
 
   return (
     <Form {...form}>
-      <OnboardingBackButton />
-      <div className="py-3 space-y-3">
-        <CardTitle>Join an Existing Business</CardTitle>
-        <CardDescription>
-          Please provide the Business ID to join an existing business. This
-          information will help us link your account to the correct business.
-        </CardDescription>
+      <div className="p-6 space-y-6">
+        <OnboardingBackButton />
+        <div className="space-y-2">
+          <CardTitle className="text-2xl font-semibold">
+            Join Business
+          </CardTitle>
+          <CardDescription className="text-muted-foreground">
+            Enter the business ID to connect.
+          </CardDescription>
+        </div>
+        <FormDescriptionMessage type={messageType} message={formMessage} />
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="businessId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel htmlFor="businessId">Business ID</FormLabel>
+                <FormControl>
+                  <Input
+                    type="text"
+                    id="businessId"
+                    variant={"lg"}
+                    placeholder="Enter the business ID"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <ContinueButton
+            isSubmitting={isSubmitting}
+            title="Join Business"
+            // className="w-full mt-6"
+          />
+        </form>
       </div>
-      <FormDescriptionMessage type={messageType} message={formMessage} />
-      <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
-          control={form.control}
-          name="businessId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel htmlFor="businessId">Business ID</FormLabel>
-              <FormControl>
-                <Input
-                  type="text"
-                  id="businessId"
-                  placeholder="Enter the business ID"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <ContinueButton
-          isSubmitting={isSubmitting}
-          title="Complete Onboarding"
-        />
-      </form>
     </Form>
   );
 };

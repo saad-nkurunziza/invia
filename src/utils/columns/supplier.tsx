@@ -3,6 +3,7 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { DataTableColumnHeader } from "@/components/table/table-tools";
 import { Supplier } from "@prisma/client";
+import { format } from "date-fns";
 
 export const supplierColumns: ColumnDef<Supplier>[] = [
   {
@@ -48,7 +49,7 @@ export const supplierColumns: ColumnDef<Supplier>[] = [
     ),
     cell: ({ row }) => {
       const date = row.getValue("created_at") as Date;
-      return <div>{date.toLocaleDateString()}</div>;
+      return <div>{format(date, "d MMM")}</div>;
     },
   },
 ];

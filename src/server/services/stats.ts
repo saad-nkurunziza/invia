@@ -194,7 +194,12 @@ export const marketCap = async () => {
       const selling_price = product.current_version?.selling_price || 0;
       return total + stock * +selling_price;
     }, 0);
-    return marketCapValue;
+
+    return {
+      status: "success",
+      msg: "Market cap retrieved successfully",
+      data: marketCapValue,
+    };
   } catch (error) {
     console.error(error);
     return {

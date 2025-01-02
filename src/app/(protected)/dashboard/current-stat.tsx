@@ -1,20 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, CreditCard, Users } from "lucide-react";
-// import {
-//   BanknotesIcon,
-//   ShoppingBagIcon,
-//   CurrencyDollarIcon,
-// } from "@heroicons/react/24/outline";
-// import {
-//   productCount,
-//   totalStock,
-//   supplierCount,
-//   totalPurchase,
-//   totalSale,
-//   marketCap,
-// } from "@/actions/analysis_stats";
 import { Fragment } from "react";
-import MoreInfo from "@/components/MoreInfo";
+import MoreInfo from "@/components/more-info";
 import {
   marketCap,
   productCount,
@@ -26,41 +13,41 @@ export default async function Stat() {
   const product_count = await productCount();
   const total_stock = await totalStock();
   const supplier_count = await supplierCount();
-  // const total_purchase = await totalPurchase();
-  // const total_sale = await totalSale();
   const stock_value = await marketCap();
 
+  if (!product_count || !total_stock || !supplier_count || !stock_value) {
+    return null;
+  }
   const data = [
     {
       title: "Stock Value",
-      qty: `${stock_value}`,
+      qty: `${stock_value.data}`,
       icon: DollarSign,
       span: "rwf",
       description: "Total value of all stock in Rwandan Francs",
     },
     {
       title: "Stock",
-      qty: `${total_stock}`,
+      qty: `${total_stock.data}`,
       icon: CreditCard,
       span: "items",
       description: "Total number of items currently in stock",
     },
     {
       title: "Products",
-      qty: `${product_count}`,
+      qty: `${product_count.data}`,
       icon: DollarSign,
       span: "products",
       description: "Total number of different products available",
     },
     {
       title: "Suppliers",
-      qty: `${supplier_count}`,
+      qty: `${supplier_count.data}`,
       icon: Users,
       span: "suppliers",
       description: "Total number of suppliers providing products",
     },
   ];
-
   return (
     <Fragment>
       {data.map((stat, i) => (

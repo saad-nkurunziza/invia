@@ -1,8 +1,10 @@
 "use server";
+import { UserFormSchemaZod } from "@/components/input/user-form";
 import { db } from "@/lib/db";
 import { getAuthenticatedUser } from "@/server/auth";
 import type { User } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
 export async function addUser(user: User, businessId: string) {
   try {
@@ -69,12 +71,16 @@ export async function addUser(user: User, businessId: string) {
   }
 }
 
-export async function editUser(userId: string, userData: Partial<User>) {
+export async function editUser(
+  userId: string,
+  userData: z.infer<typeof UserFormSchemaZod>
+) {
   try {
     const authenticatedUser = await getAuthenticatedUser();
-    if (!authenticatedUser) return { error: "User not authenticated" };
-    if (authenticatedUser.role !== "ADMIN" && authenticatedUser.id !== userId)
-      return { error: "Unauthorized" };
+    if (!authenticatedUser)
+      return { status: "error", msg: "User not authenticated" };
+    // if (authenticatedUser.role !== "ADMIN" && authenticatedUser.id !== userId)
+    //   return { error: "Unauthorized" };
 
     const updatedUser = await db.$transaction(async (tx) => {
       const existingUser = await tx.user.findUnique({
@@ -129,8 +135,10 @@ export async function editUser(userId: string, userData: Partial<User>) {
 export async function deleteUser(userId: string) {
   try {
     const authenticatedUser = await getAuthenticatedUser();
-    if (!authenticatedUser) return { error: "User not authenticated" };
-    if (authenticatedUser.role !== "ADMIN") return { error: "Unauthorized" };
+    if (!authenticatedUser)
+      return { status: "error", msg: "User not authenticated" };
+    if (authenticatedUser.role !== "ADMIN")
+      return { status: "error", msg: "Unauthorized" };
 
     const result = await db.$transaction(async (tx) => {
       const existingUser = await tx.user.findUnique({

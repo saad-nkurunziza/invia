@@ -2,6 +2,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { TransactionTypes } from "../types";
 import { DataTableColumnHeader } from "@/components/table/table-tools";
+import { format } from "date-fns";
 
 export const transactionColumns: ColumnDef<TransactionTypes>[] = [
   {
@@ -42,7 +43,7 @@ export const transactionColumns: ColumnDef<TransactionTypes>[] = [
     ),
     cell: ({ row }) => {
       const date = row.getValue("created_at") as Date;
-      return <div>{date.toLocaleDateString()}</div>;
+      return <div>{format(date, "d MMM")}</div>;
     },
   },
 ];

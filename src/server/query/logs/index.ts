@@ -46,6 +46,37 @@ export async function fetchLogs(date?: Date) {
     };
   }
 }
+export async function fetchSliceLogs() {
+  try {
+    const user = await getAuthenticatedUser();
+    if (!user) return { status: "error", msg: "User not authenticated" };
+
+    const logs = await db.log.findMany({
+      where: {
+        business_id: user.businessId,
+      },
+      take: 4,
+      orderBy: { created_at: "desc" },
+      include: {
+        user: true,
+        product: true,
+        supplier: true,
+      },
+    });
+
+    return {
+      status: "success",
+      msg: "Logs fetched successfully",
+      data: logs,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error fetching logs `,
+    };
+  }
+}
 
 export async function fetchLogsByType(type: Log["type"], date?: Date) {
   try {

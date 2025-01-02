@@ -11,7 +11,7 @@ export async function addProduct(
   try {
     const user = await getAuthenticatedUser();
     if (!user) return { status: "error", msg: "User not authenticated" };
-    console.log({ product, businessId: user.businessId });
+
     const existingProduct = await db.product.findFirst({
       where: {
         OR: [
@@ -213,79 +213,79 @@ export async function createProductVersion(
   }
 }
 
-// export async function editProduct(
-//   productId: string,
-//   product: Partial<ProductVersion>
-// ) {
-//   try {
-//     const user = await getAuthenticatedUser();
-//      if (!user) return { status: "error", msg: "User not authenticated" };
+export async function editProduct(
+  productId: string,
+  product: z.infer<typeof CreateProductFormSchema>
+) {
+  try {
+    const user = await getAuthenticatedUser();
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
-//     const updatedProduct = await db.$transaction(async (tx) => {
-//       const existingProduct = await tx.product.findUnique({
-//         where: {
-//           id: productId,
-//           business_id: user.businessId,
-//         },
-//       });
+    const updatedProduct = await db.$transaction(async (tx) => {
+      const existingProduct = await tx.product.findUnique({
+        where: {
+          id: productId,
+          business_id: user.businessId,
+        },
+      });
 
-//       if (!existingProduct) {
-//         return {
-//           status: "error",
-//           msg: "No product found",
-//         };
-//       }
+      if (!existingProduct) {
+        return {
+          status: "error",
+          msg: "No product found",
+        };
+      }
 
-//       const updatedProduct = await tx.product.update({
-//         where: {
-//           id: productId,
-//         },
-//         data: {
-//           name: product.name,
-//           description: product.description,
-//           current_version: {
-//             update: product,
-//           },
-//         },
-//         include: {
-//           current_version: true,
-//         },
-//       });
+      const updatedProduct = await tx.product.update({
+        where: {
+          id: productId,
+        },
+        data: {
+          name: product.name,
+          description: product.description,
+          current_version: {
+            update: product,
+          },
+        },
+        include: {
+          current_version: true,
+        },
+      });
 
-//       if (!updatedProduct) {
-//         return {
-//           status: "error",
-//           msg: "Failed to update product",
-//         };
-//       }
+      if (!updatedProduct) {
+        return {
+          status: "error",
+          msg: "Failed to update product",
+        };
+      }
 
-//       await tx.log.create({
-//         data: {
-//           product_id: productId,
-//           supplier_id: updatedProduct.supplier_id,
-//           type: "PRODUCT_UPDATE",
-//           user_id: user.id,
-//           business_id: user.businessId ?? "",
-//         },
-//       });
+      await tx.log.create({
+        data: {
+          product_id: productId,
+          supplier_id: updatedProduct.supplier_id,
+          type: "PRODUCT_UPDATE",
+          user_id: user.id,
+          business_id: user.businessId ?? "",
+        },
+      });
 
-//       revalidatePath("/", "layout");
-//       return {
-//         status: "success",
-//         msg: "Product updated successfully",
-//         data: updatedProduct,
-//       };
-//     });
+      revalidatePath("/", "layout");
+      return {
+        status: "success",
+        msg: "Product updated successfully",
+        data: updatedProduct,
+      };
+    });
 
-//     return updatedProduct;
-//   } catch (error) {
-//     console.error(error)
-//       return {
-//         status: "error",
-//         msg: `Error updating product `,
-//       };
-//   }
-// }
+    return updatedProduct;
+  } catch (error) {
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error updating product `,
+    };
+  }
+}
 
 export async function deleteProduct(productId: string) {
   try {

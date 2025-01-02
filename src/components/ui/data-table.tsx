@@ -36,8 +36,8 @@ import {
   CardTitle,
   CardHeader,
 } from "@/components/ui/card";
-// import { DataTableExportOptions } from "@/components/table/export-data";
-// import { TableTimeRange } from "@/components/table/time-range";
+import { DataTableExportOptions } from "@/components/table/export-data";
+import { TableTimeRange } from "@/components/table/time-range";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -53,7 +53,7 @@ export default function DataTable<TData, TValue>({
   data,
   title,
   type,
-  // patch = false,
+  patch = false,
   searchKey = "name",
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -88,13 +88,13 @@ export default function DataTable<TData, TValue>({
         <CardTitle>{title}</CardTitle>
         <div className="flex items-center gap-2">
           <DataTableSearchOptions table={table} searchKey={searchKey} />
-          {/* {type !== "stock_alert" && !patch && (
+          {type !== "stock_alert" && !patch && (
             <TableTimeRange path={`${type}s`} />
-          )} */}
+          )}
 
           <div className="ml-auto flex gap-2">
             <DataTableViewOptions table={table} />
-            {/* <DataTableExportOptions table={table} title={title} /> */}
+            <DataTableExportOptions table={table} title={title} />
             {(type === "product" || type === "supplier") && (
               <Button size="sm" className="h-7 gap-1" asChild>
                 <Link href={`/add-${type}`}>

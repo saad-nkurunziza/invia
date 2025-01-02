@@ -8,11 +8,12 @@ import {
 } from "@/server/query/transactions/index";
 import { transactionColumns } from "@/utils/columns/transaction";
 
-const page = async ({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | undefined };
-}) => {
+const page = async (
+  props: {
+    searchParams: Promise<{ [key: string]: string | undefined }>;
+  }
+) => {
+  const searchParams = await props.searchParams;
   const crumbsLinks = [
     { label: "Dashboard", href: "/" },
     { label: "Transactions" },

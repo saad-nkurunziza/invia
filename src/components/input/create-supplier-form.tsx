@@ -27,7 +27,7 @@ import { z } from "zod";
 import { Loader } from "lucide-react";
 import { addSupplier } from "@/server/input/supplier";
 
-export const CreateSupplierFormSchema = z.object({
+export const EntrySupplierFormSchema = z.object({
   name: z.string(),
   address: z.string(),
   tel: z.string(),
@@ -35,8 +35,8 @@ export const CreateSupplierFormSchema = z.object({
 });
 
 const CreateSupplier = () => {
-  const form = useForm<z.infer<typeof CreateSupplierFormSchema>>({
-    resolver: zodResolver(CreateSupplierFormSchema),
+  const form = useForm<z.infer<typeof EntrySupplierFormSchema>>({
+    resolver: zodResolver(EntrySupplierFormSchema),
     defaultValues: {
       name: "",
       address: "",
@@ -46,7 +46,7 @@ const CreateSupplier = () => {
   });
   const { isSubmitting, isDirty } = form.formState;
 
-  async function onSubmit(data: z.infer<typeof CreateSupplierFormSchema>) {
+  async function onSubmit(data: z.infer<typeof EntrySupplierFormSchema>) {
     const res = await addSupplier(data);
     if (res.status === "error") {
       toast.error(res.msg);

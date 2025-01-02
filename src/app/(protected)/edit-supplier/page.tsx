@@ -1,21 +1,22 @@
 import React from "react";
-import { fetchSupplierById } from "@/actions/query";
-import EditSupplier from "./edit-supplier";
 import { redirect } from "next/navigation";
-const page = async ({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | undefined };
-}) => {
+import { fetchSupplierById } from "@/server/query/supplier";
+import EditSupplierForm from "@/components/input/edit-supplier-form";
+const page = async (
+  props: {
+    searchParams: Promise<{ [key: string]: string | undefined }>;
+  }
+) => {
+  const searchParams = await props.searchParams;
   const supplierId = searchParams.product as string;
   if (!supplierId) {
     redirect("/suppliers");
   }
   const supplier = await fetchSupplierById(supplierId);
-  if (!supplier) return;
+  if (!supplier || !supplier.data) return;
   return (
     <main className="p-2 md:p-4 sm:px-6 sm:py-0">
-      <EditSupplier supplier={supplier} />
+      <EditSupplierForm supplier={supplier.data} />
     </main>
   );
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import {
@@ -21,10 +21,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { UserOptions } from "jspdf-autotable";
+import { format } from "date-fns";
 
 interface DataTableExportOptionsProps<TData> {
   table: Table<TData>;
   title: string;
+}
+
+interface jsPDFCustom extends jsPDF {
+  autoTable: (options: UserOptions) => void;
 }
 
 export function DataTableExportOptions<TData>({
@@ -35,16 +41,6 @@ export function DataTableExportOptions<TData>({
   const [iconState, setIconState] = useState<"file" | "loader" | "check">(
     "file"
   );
-
-  useEffect(() => {
-    if (iconState === "loader") {
-      const loaderTimer = setTimeout(() => setIconState("check"), 3000);
-      return () => clearTimeout(loaderTimer);
-    } else if (iconState === "check") {
-      const checkTimer = setTimeout(() => setIconState("file"), 2000);
-      return () => clearTimeout(checkTimer);
-    }
-  }, [iconState]);
 
   const getIcon = () => {
     switch (iconState) {
@@ -57,33 +53,81 @@ export function DataTableExportOptions<TData>({
     }
   };
 
-  const exportToPDF = () => {
+  const exportToPDF = async () => {
     setIconState("loader");
-    const doc = new jsPDF();
-    const columnsForPDF = table
+
+    const doc = new jsPDF() as jsPDFCustom;
+
+    const rowCols = table
       .getAllColumns()
       .filter((column) => column.getIsVisible())
-      .map((column) =>
-        column.id
-          .split("_")
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" ")
-      );
+      .map((column) => column.id);
+
+    const columnsForPDF = rowCols.map((col) =>
+      col
+        .split("_")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ")
+    );
 
     const rowsForPDF = table
       .getRowModel()
       .rows.slice(0, rowCount)
-      .map((row) => columnsForPDF.map((colId) => row.getValue(colId)));
+      .map((row) =>
+        rowCols.map((colId) => {
+          const value = row.getValue(colId);
+          if (colId === "created_at" && value) {
+            return format(new Date(value as Date), "dd-MM-yyyy");
+          }
+          if (colId === "type" && value) {
+            if (typeof value === "string") {
+              return value
+                .split("_")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ");
+            }
+            return String(value);
+          }
+          if (typeof value === "string") {
+            return value.charAt(0).toUpperCase() + value.slice(1);
+          }
+          return value;
+        })
+      );
 
-    //@ts-expect-error: Ignoring type error due to third-party library incompatibility
+    doc.setFontSize(10);
+    doc.setTextColor(150);
+    doc.text("Business Name", 14, 16);
+    doc.setTextColor(0, 0, 0);
+    doc.text(title, 14, 30);
+
     doc.autoTable({
       head: [columnsForPDF],
+      //@ts-expect-error Lkdd
       body: rowsForPDF,
-      margin: { top: 20 },
+      startY: 40,
+      theme: "striped",
+      styles: {
+        fillColor: [245, 245, 245],
+        fontSize: 11,
+      },
+      headStyles: {
+        fillColor: [50, 50, 50],
+        textColor: [255, 255, 255],
+        fontSize: 11,
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240],
+      },
+      tableWidth: "auto",
+      margin: { left: 14, right: 14 },
     });
+    doc.setTextColor(150);
+    doc.text("© Invia", 6, doc.internal.pageSize.height - 10);
 
-    const today = new Date().toISOString().split("T")[0];
-    doc.save(`${title}_${today}.pdf`);
+    doc.save(`${title}.pdf`);
+    setTimeout(() => setIconState("check"), 3000);
+    setTimeout(() => setIconState("file"), 1000);
   };
 
   return (

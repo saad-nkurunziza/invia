@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRightCircle, ArrowLeftCircle } from "lucide-react";
 import { Fragment } from "react";
-import MoreInfo from "@/components/MoreInfo";
+import MoreInfo from "@/components/more-info";
 import { getOpeningClosingStockValues } from "@/server/monthly-analysis/statements";
 
 export default async function StockMarginStat({

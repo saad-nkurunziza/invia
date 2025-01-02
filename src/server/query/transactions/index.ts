@@ -46,6 +46,39 @@ export async function fetchTransactions(date?: Date) {
   }
 }
 
+export async function fetchSliceTransactions() {
+  try {
+    const user = await getAuthenticatedUser();
+    if (!user) return { status: "error", msg: "User not authenticated" };
+
+    const transactions = await db.stockMovement.findMany({
+      where: {
+        business_id: user.businessId,
+      },
+      take: 4,
+      orderBy: { created_at: "desc" },
+      include: {
+        product: {
+          include: { current_version: true },
+        },
+        user: true,
+      },
+    });
+
+    return {
+      status: "success",
+      msg: "Transactions fetched successfully",
+      data: transactions,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      status: "error",
+      msg: `Error fetching transactions `,
+    };
+  }
+}
+
 export async function fetchTransactionsByProduct(
   productId: string,
   date?: Date

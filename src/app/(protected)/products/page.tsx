@@ -8,13 +8,14 @@ import {
   fetchOutStockProducts,
   fetchProducts,
 } from "@/server/query/products";
-import { fetchLowStockProducts } from "@/server/query/products/index";
+// import { fetchLowStockProducts } from "@/server/query/products/index";
 
-const page = async ({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | undefined };
-}) => {
+const page = async (
+  props: {
+    searchParams: Promise<{ [key: string]: string | undefined }>;
+  }
+) => {
+  const searchParams = await props.searchParams;
   const crumbsLinks = [
     { label: "Dashboard", href: "/" },
     { label: "Products" },
@@ -39,16 +40,17 @@ const page = async ({
     date = new Date(year, month - 1, 1);
   }
   const allProducts = await fetchProducts(date);
-  const belowThresholdProducts = await fetchLowStockProducts(date);
+  // const belowThresholdProducts = await fetchLowStockProducts(date);
   const inStockProducts = await fetchInStockProducts(date);
   const outOfStockProducts = await fetchOutStockProducts(date);
+
   if (
     !allProducts ||
     allProducts.status === "error" ||
     !allProducts.data ||
-    !belowThresholdProducts ||
-    belowThresholdProducts.status === "error" ||
-    !belowThresholdProducts.data ||
+    // !belowThresholdProducts ||
+    // belowThresholdProducts.status === "error" ||
+    // !belowThresholdProducts.data ||
     !inStockProducts ||
     inStockProducts.status === "error" ||
     !inStockProducts.data ||
@@ -65,7 +67,7 @@ const page = async ({
           {" "}
           <TabsList>
             <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="below_threshold">Below threshold</TabsTrigger>
+            {/* <TabsTrigger value="below_threshold">Below threshold</TabsTrigger> */}
             <TabsTrigger value="in_stock">In Stock</TabsTrigger>
             <TabsTrigger value="out_of_stock">Out of Stock</TabsTrigger>
             {/* <TabsTrigger value="active">Active</TabsTrigger>
@@ -82,7 +84,7 @@ const page = async ({
             />
           </main>
         </TabsContent>
-        <TabsContent value="below_threshold">
+        {/* <TabsContent value="below_threshold">
           <main className="grid flex-1 items-start gap-4 md:gap-8">
             <DataTable
               columns={productColumns}
@@ -91,7 +93,7 @@ const page = async ({
               type="product"
             />
           </main>
-        </TabsContent>
+        </TabsContent> */}
         <TabsContent value="in_stock">
           <main className="grid flex-1 items-start gap-4 md:gap-8">
             <DataTable

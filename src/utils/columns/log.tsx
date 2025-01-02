@@ -2,6 +2,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { LogTypes } from "../types";
 import { DataTableColumnHeader } from "@/components/table/table-tools";
+import { format } from "date-fns";
 
 export const logColumns: ColumnDef<LogTypes>[] = [
   {
@@ -11,8 +12,8 @@ export const logColumns: ColumnDef<LogTypes>[] = [
     ),
     cell: ({ row }) => {
       const type = row.getValue("type") as string;
-      const formattedString = type.split("_").join(" ");
-      return <div className="capitalize">{formattedString}</div>;
+      const formattedString = type.split("_").join(" ").toLowerCase();
+      return <div className="">{formattedString}</div>;
     },
   },
   {
@@ -52,7 +53,7 @@ export const logColumns: ColumnDef<LogTypes>[] = [
     ),
     cell: ({ row }) => {
       const date = row.getValue("created_at") as Date;
-      return <div>{date.toLocaleDateString()}</div>;
+      return <div>{format(date, "d MMM")}</div>;
     },
   },
 ];

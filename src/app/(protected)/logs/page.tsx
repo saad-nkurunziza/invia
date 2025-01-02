@@ -5,11 +5,12 @@ import React from "react";
 import { fetchLogs, fetchLogsByType } from "@/server/query/logs/index";
 import { logColumns } from "@/utils/columns/log";
 
-const page = async ({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | undefined };
-}) => {
+const page = async (
+  props: {
+    searchParams: Promise<{ [key: string]: string | undefined }>;
+  }
+) => {
+  const searchParams = await props.searchParams;
   const crumbsLinks = [{ label: "Dashboard", href: "/" }, { label: "Logs" }];
   const time_range = searchParams.t as string;
   let date: Date = new Date();
@@ -56,7 +57,7 @@ const page = async ({
     return null;
 
   return (
-    <div className="space-y-8 mx-auto flex flex-col justify-center">
+    <div className="space-y-8 flex flex-col justify-center">
       <Crumbs crumbs={crumbsLinks} />
       <Tabs defaultValue="all">
         <div className="overflow-x-auto w-3/4 md:w-full">

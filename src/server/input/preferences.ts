@@ -3,22 +3,25 @@ import { db } from "@/lib/db";
 import { getAuthenticatedUser } from "@/server/auth";
 import { revalidatePath } from "next/cache";
 
-export async function saveStockName(stockName: string) {
+export async function saveStockName(formData: FormData): Promise<void> {
+  const stockName = formData.get("stock_name") as string;
+
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { status: "error", msg: "User not authenticated" };
+    if (!user) {
+      console.error("User not authenticated");
+      return;
+    }
 
-    const result = await db.$transaction(async (tx) => {
-      const updatedSetting = await tx.preferences.upsert({
+    await db.$transaction(async (tx) => {
+      await tx.preference.upsert({
         where: {
           key_business_id: {
             key: "stock_name",
             business_id: user.businessId ?? "",
           },
         },
-        update: {
-          value: stockName,
-        },
+        update: { value: stockName },
         create: {
           key: "stock_name",
           value: stockName,
@@ -26,13 +29,7 @@ export async function saveStockName(stockName: string) {
         },
       });
 
-      if (!updatedSetting) {
-        return {
-          status: "error",
-          msg: "Error saving stock name",
-        };
-      }
-
+      // Log user action
       await tx.log.create({
         data: {
           type: "USER_ACTION",
@@ -42,30 +39,23 @@ export async function saveStockName(stockName: string) {
       });
 
       revalidatePath("/", "layout");
-      return {
-        status: "success",
-        msg: "Stock name saved successfully",
-        data: updatedSetting,
-      };
     });
-
-    return result;
   } catch (error) {
-    console.error(error);
-    return {
-      status: "error",
-      msg: `Error saving stock name `,
-    };
+    console.error("Error saving stock name:", error);
   }
 }
 
-export async function saveThresholdMargin(thresholdMargin: string) {
+export async function saveThresholdMargin(formData: FormData): Promise<void> {
+  const thresholdMargin = formData.get("stock_name") as string;
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { status: "error", msg: "User not authenticated" };
+    if (!user) {
+      console.error("User not authenticated");
+      return;
+    }
 
-    const result = await db.$transaction(async (tx) => {
-      const updatedSetting = await tx.preferences.upsert({
+    await db.$transaction(async (tx) => {
+      await tx.preference.upsert({
         where: {
           key_business_id: {
             key: "threshold_margin",
@@ -82,13 +72,6 @@ export async function saveThresholdMargin(thresholdMargin: string) {
         },
       });
 
-      if (!updatedSetting) {
-        return {
-          status: "error",
-          msg: "Error saving threshold margin",
-        };
-      }
-
       await tx.log.create({
         data: {
           type: "USER_ACTION",
@@ -98,20 +81,9 @@ export async function saveThresholdMargin(thresholdMargin: string) {
       });
 
       revalidatePath("/", "layout");
-      return {
-        status: "success",
-        msg: "Threshold margin saved successfully",
-        data: updatedSetting,
-      };
     });
-
-    return result;
   } catch (error) {
     console.error(error);
-    return {
-      status: "error",
-      msg: `Error saving threshold margin `,
-    };
   }
 }
 
@@ -120,7 +92,7 @@ export async function getPreferences() {
     const user = await getAuthenticatedUser();
     if (!user) return { status: "error", msg: "User not authenticated" };
 
-    const preferences = await db.preferences.findMany({
+    const preferences = await db.preference.findMany({
       where: {
         business_id: user.businessId,
       },

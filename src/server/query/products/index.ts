@@ -42,6 +42,16 @@ export async function fetchProducts(date?: Date) {
   }
 }
 
+export const fetchProductsSWR = async (date?: Date) => {
+  const response = await fetchProducts(date);
+
+  if (response.status !== "success") {
+    throw new Error(response.msg || "Failed to fetch products");
+  }
+
+  return response.data;
+};
+
 export async function fetchProductById(productId: string) {
   try {
     const user = await getAuthenticatedUser();
@@ -169,7 +179,7 @@ export async function fetchLowStockProducts(date?: Date) {
   try {
     const user = await getAuthenticatedUser();
     if (!user) return { status: "error", msg: "User not authenticated" };
-    const margin_value_const = await db.preferences.findFirst({
+    const margin_value_const = await db.preference.findFirst({
       where: {
         key: "threshold_margin",
       },

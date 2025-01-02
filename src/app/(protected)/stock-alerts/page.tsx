@@ -26,7 +26,7 @@ const page = async () => {
   )
     return null;
   return (
-    <div className="space-y-8 mx-auto flex flex-col justify-center">
+    <div className="space-y-8 flex flex-col justify-center">
       <Crumbs crumbs={crumbsLinks} />
 
       <Tabs defaultValue="lowStock">

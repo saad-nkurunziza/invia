@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ListChecks, DollarSign, ShoppingCart, CreditCard } from "lucide-react";
 import { Fragment } from "react";
-import MoreInfo from "@/components/MoreInfo";
+import MoreInfo from "@/components/more-info";
 import {
   calculateMonthPurchaseValue,
   getPurchaseCount,
