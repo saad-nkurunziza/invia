@@ -44,7 +44,7 @@ const page = async () => {
           </TabsContent>
         </Tabs>
       </TitleContainer>
-
+      {/* 
       <div className="hidden md:grid md:grid-cols-3 grid-cols-1 gap-6">
         <div className="col-span-3">
           <TitleContainer title="Stock Watchlists">
@@ -53,27 +53,27 @@ const page = async () => {
                 <TabsTrigger value="sale">Sales</TabsTrigger>
                 <TabsTrigger value="purchase">Purchases</TabsTrigger>
               </TabsList>
-              {/* <TabsContent value="sale">
+              <TabsContent value="sale">
                 <Watchlists
                   data={recent_sales_statistics.data || []}
                   title="Sales"
                 />
-              </TabsContent> */}
-              {/* <TabsContent value="purchase">
+              </TabsContent>
+              <TabsContent value="purchase">
                 <Watchlists
                   data={recent_purchase_statistics.data || []}
                   title="Purchases"
                 />
-              </TabsContent> */}
+              </TabsContent>
             </Tabs>
           </TitleContainer>
         </div>
-      </div>
-      <RecentTransactions />
-      <div className="grid auto-rows-auto gap-6">
-        {/* <MostSold /> */}
+      </div> */}
+      <TitleContainer title="Recent entries">
+        <RecentTransactions />
         <RecentLogs />
-      </div>
+      </TitleContainer>
+      <div className="grid auto-rows-auto gap-6">{/* <MostSold /> */}</div>
     </div>
   );
 };

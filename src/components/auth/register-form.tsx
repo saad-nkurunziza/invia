@@ -17,6 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { register } from "@/server/auth/register";
 import FormDescriptionMessage from "./form-description-message";
+import { PasswordInput } from "../ui/password-input";
 
 const RegisterForm = () => {
   const [formMessage, setFormMessage] = useState<string | null>(null);
@@ -55,7 +56,9 @@ const RegisterForm = () => {
       <FormDescription>
         Please enter your details to create a new account.
       </FormDescription>
+      <div className="my-1.5" />
       <FormDescriptionMessage type={messageType} message={formMessage} />
+      <div className="my-1.5" />
       <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
@@ -102,8 +105,7 @@ const RegisterForm = () => {
             <FormItem>
               <FormLabel htmlFor="password">Password</FormLabel>
               <FormControl>
-                <Input
-                  type="password"
+                <PasswordInput
                   id="password"
                   placeholder="*******"
                   className=""
@@ -121,8 +123,7 @@ const RegisterForm = () => {
             <FormItem>
               <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
               <FormControl>
-                <Input
-                  type="password"
+                <PasswordInput
                   id="confirmPassword"
                   placeholder="*******"
                   className=""

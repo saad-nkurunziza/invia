@@ -9,6 +9,9 @@ import {
   Settings,
   ShieldCheck,
   Bot,
+  CreditCard,
+  Calendar,
+  Calculator,
 } from "lucide-react";
 
 import { NavMain } from "@/components/navigation/nav-main";
@@ -109,12 +112,22 @@ const data = {
     {
       title: "Payment Portal",
       url: "/payment-portal",
-      icon: FileText,
+      icon: CreditCard,
     },
     {
-      title: "Settings",
+      title: "Task Scheduler",
+      url: "/task-scheduler",
+      icon: Calendar,
+    },
+    {
+      title: "Financial Calculator",
+      url: "/financial-calculator",
+      icon: Calculator,
+    },
+    {
+      title: "Preferences",
+      url: "/preferences",
       icon: Settings,
-      isComponent: true,
     },
   ],
 };
@@ -127,7 +140,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <BusinessSwitcher />
         </React.Suspense>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="scrollbar-hide">
         <NavMain items={data.navMain} />
         <NavUtilities utilities={data.utilities} />
       </SidebarContent>

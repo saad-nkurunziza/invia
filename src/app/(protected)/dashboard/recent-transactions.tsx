@@ -36,7 +36,7 @@ const RecentTransactions = async () => {
       <CardContent className="grid gap-8">
         <Table>
           <TableHeader>
-            <TableRow className="text-xs sm:text-base">
+            <TableRow>
               <TableHead>Product</TableHead>
               <TableHead className="text-right">Quantity</TableHead>
             </TableRow>
@@ -48,14 +48,16 @@ const RecentTransactions = async () => {
               return (
                 <TableRow key={item.id}>
                   <TableCell>
-                    <div className="font-medium">{item.product.name}</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="font-medium text-xs">
+                      {item.product.name}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
                       {item.product_id}
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="font-medium">{item.quantity}</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-xs text-muted-foreground">
                       {formatPrice(selling_price)}
                     </div>
                   </TableCell>

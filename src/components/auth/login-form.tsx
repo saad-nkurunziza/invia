@@ -16,6 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { login } from "@/server/auth/login";
 import FormDescriptionMessage from "./form-description-message";
+import { PasswordInput } from "../ui/password-input";
 
 const LoginForm = () => {
   const [formMessage, setFormMessage] = useState<string | null>(null);
@@ -79,8 +80,7 @@ const LoginForm = () => {
             <FormItem>
               <FormLabel htmlFor="password">Password</FormLabel>
               <FormControl>
-                <Input
-                  type="password"
+                <PasswordInput
                   id="password"
                   placeholder="*******"
                   className=""

@@ -97,6 +97,7 @@ model BusinessUser {
   join_date   DateTime  @default(now())
   last_access DateTime  @updatedAt
   deleted_at  DateTime?
+  tasks       Task[]
 
   @@id([user_id, business_id])
   @@index([business_id])
@@ -257,4 +258,19 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+// Utility tables
+
+model Task {
+  id                      Int          @id @default(autoincrement())
+  text                    String
+  date                    DateTime
+  category                String
+  priority                String
+  business_user           BusinessUser @relation(fields: [businessUserUser_id, businessUserBusiness_id], references: [user_id, business_id])
+  businessUserUser_id     String
+  businessUserBusiness_id String
+
+  @@map("tasks")
 }

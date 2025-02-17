@@ -3,7 +3,6 @@ import { auth } from "@/lib/auth";
 import React, { ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { redirect } from "next/navigation";
-import { integrateMonthlyStockValue } from "@/server/input/analysis";
 import { AppSidebar } from "@/components/navigation/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import { SessionProvider } from "next-auth/react";
@@ -18,11 +17,6 @@ import CurrentBreadcrumb from "@/components/navigation/current-breadcrumb";
 import TransactionContainer from "@/components/transaction-container";
 import { Button } from "@/components/ui/button";
 import { FlipHorizontal, FlipVertical, Settings } from "lucide-react";
-import { SettingsDialog } from "@/components/settings/settings-dialog";
-
-export const metadata: Metadata = {
-  title: "Invia",
-};
 
 export default async function ProtectedLayout({
   children,
@@ -33,7 +27,6 @@ export default async function ProtectedLayout({
   if (!session || !session.user || !session.user.businessId) {
     redirect("/onboarding");
   }
-  await integrateMonthlyStockValue();
   // const cookieStore = await cookies();
   // const sidebarState = cookieStore.get("sidebar:state")?.value || "true";
   // console.log({ sidebarState });
@@ -59,16 +52,6 @@ export default async function ProtectedLayout({
               <CurrentBreadcrumb />
             </div>
             <div className="flex gap-4 ml-auto">
-              <SettingsDialog>
-                <Button
-                  className="rounded-none shadow-none first:rounded-s-lg last:rounded-e-lg focus-visible:z-10"
-                  variant="outline"
-                  size="icon"
-                  aria-label="Flip Horizontal"
-                >
-                  <Settings size={16} strokeWidth={2} aria-hidden="true" />
-                </Button>
-              </SettingsDialog>
               <div className="inline-flex -space-x-px rounded-lg shadow-sm shadow-black/5 rtl:space-x-reverse">
                 <TransactionContainer tag="sale">
                   <Button
@@ -102,7 +85,7 @@ export default async function ProtectedLayout({
               <QuickAccessIconButton />
             </div>
           </header>
-          <div className="select-none flex flex-1 flex-col gap-4 p-4 pt-0">
+          <div className="select-none relative flex flex-1 flex-col gap-4 p-4 pt-7">
             {children}
           </div>
         </SidebarInset>

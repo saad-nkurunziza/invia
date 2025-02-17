@@ -28,7 +28,19 @@ export function DataTableSkeleton() {
   );
 }
 
-export function BusinessSwitcherSkeleton() {
+// export function BusinessSwitcherSkeleton() {
+//   return (
+//     <div className="flex items-center gap-2 p-4">
+//       <Skeleton className="h-8 w-8 rounded-lg"></Skeleton>
+//       <div className="flex-1 space-y-2">
+//         <Skeleton className="h-4 w-3/4 rounded"></Skeleton>
+//         <Skeleton className="h-3 w-1/2 rounded"></Skeleton>
+//       </div>
+//     </div>
+//   );
+// }
+
+export function NavUserSkeleton() {
   return (
     <div className="flex items-center gap-2 p-4">
       <Skeleton className="h-8 w-8 rounded-lg"></Skeleton>
@@ -40,14 +52,17 @@ export function BusinessSwitcherSkeleton() {
   );
 }
 
-export function NavUserSkeleton() {
+export function BusinessSwitcherSkeleton() {
   return (
-    <div className="flex items-center gap-2 p-4">
-      <Skeleton className="h-8 w-8 rounded-lg"></Skeleton>
-      <div className="flex-1 space-y-2">
-        <Skeleton className="h-4 w-3/4 rounded"></Skeleton>
-        <Skeleton className="h-3 w-1/2 rounded"></Skeleton>
+    <Skeleton className="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 group-has- opacity-80 h-12 text-sm group-data-[collapsible=icon]:!p-0">
+      <Skeleton className="flex aspect-square size-8 items-center justify-center rounded-lg opacity-75">
+        <Skeleton className="size-4" />
+      </Skeleton>
+      <div className="grid flex-1 text-left text-sm leading-tight">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-3 w-1/2 mt-1" />
       </div>
-    </div>
+      <Skeleton className="ml-auto size-4" />
+    </Skeleton>
   );
 }

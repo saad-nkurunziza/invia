@@ -8,7 +8,7 @@ import {
   Ghost,
   Zap,
   Shield,
-  Loader2,
+  // Loader2,
   BarChart3,
   ClipboardList,
   Briefcase,
@@ -34,6 +34,7 @@ import {
   fetchBusinesses,
 } from "@/server/query/businesses";
 import { Prisma } from "@prisma/client";
+import { BusinessSwitcherSkeleton } from "@/components/skeleton-loaders";
 
 export type UserBusinessPayload = Prisma.BusinessUserGetPayload<{
   include: {
@@ -49,13 +50,22 @@ export function BusinessSwitcher() {
     isLoading: activeLoading,
   } = useSWR<UserBusinessPayload | null>(
     "/api/active-business",
-    fetchActiveBusiness
+    fetchActiveBusiness,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 60000,
+      shouldRetryOnError: false,
+    }
   );
   const {
     data: otherBusinesses,
     error: otherError,
     isLoading: otherLoading,
-  } = useSWR<UserBusinessPayload[] | null>("/api/businesses", fetchBusinesses);
+  } = useSWR<UserBusinessPayload[] | null>("/api/businesses", fetchBusinesses, {
+    revalidateOnFocus: false,
+    dedupingInterval: 60000,
+    shouldRetryOnError: false,
+  });
 
   const isLoading = activeLoading || otherLoading;
   const error = activeError || otherError;
@@ -67,11 +77,11 @@ export function BusinessSwitcher() {
     // and then revalidate the SWR cache
   };
 
-  if (error) return <div>Failed to load businesses</div>;
+  if (error) return <BusinessSwitcherSkeleton />;
   if (isLoading || !activeBusiness)
     return (
       <div className="flex items-center justify-center p-4">
-        <Loader2 className="h-6 w-6 animate-spin" />
+        <BusinessSwitcherSkeleton />
       </div>
     );
 

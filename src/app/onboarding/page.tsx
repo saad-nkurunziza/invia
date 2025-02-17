@@ -14,16 +14,14 @@ const OnboardingPage = async (props: {
   }
   const tab = searchParams.onboard as string;
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background/50 p-4">
-      <div className="w-full max-w-lg backdrop-blur-sm bg-card border rounded-lg shadow-lg">
-        {tab === "create" ? (
-          <OnboardingCreateForm />
-        ) : tab === "join" ? (
-          <OnboardingJoinForm />
-        ) : (
-          <OnboardingTab />
-        )}
-      </div>
+    <div className="flex items-center justify-center bg-background/50">
+      {tab === "create" ? (
+        <OnboardingCreateForm />
+      ) : tab === "join" ? (
+        <OnboardingJoinForm />
+      ) : (
+        <OnboardingTab />
+      )}
     </div>
   );
 };

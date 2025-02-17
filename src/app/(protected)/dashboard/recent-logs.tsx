@@ -16,66 +16,74 @@ const getLogTypes = (type: LogType) => {
   switch (type) {
     case "NEW_SUPPLIER":
       return {
-        color: "bg-green-50 text-green-800 ring-1 ring-inset ring-green-600/20",
+        color:
+          "bg-green-50 text-green-800 ring-1 ring-inset ring-green-600/20 dark:bg-green-900 dark:text-green-200 dark:ring-green-400/20",
         title: "New supplier",
       };
     case "NEW_PRODUCT":
       return {
-        color: "bg-blue-50 text-blue-800 ring-1 ring-inset ring-blue-600/20",
+        color:
+          "bg-blue-50 text-blue-800 ring-1 ring-inset ring-blue-600/20 dark:bg-blue-900 dark:text-blue-200 dark:ring-blue-400/20",
         title: "New product",
       };
     case "NEW_PRODUCT_VERSION":
       return {
-        color: "bg-teal-50 text-teal-800 ring-1 ring-inset ring-teal-600/20",
+        color:
+          "bg-teal-50 text-teal-800 ring-1 ring-inset ring-teal-600/20 dark:bg-teal-900 dark:text-teal-200 dark:ring-teal-400/20",
         title: "New product version",
       };
     case "SUPPLIER_UPDATE":
       return {
         color:
-          "bg-yellow-50 text-yellow-800 ring-1 ring-inset ring-yellow-600/20",
+          "bg-yellow-50 text-yellow-800 ring-1 ring-inset ring-yellow-600/20 dark:bg-yellow-900 dark:text-yellow-200 dark:ring-yellow-400/20",
         title: "Supplier update",
       };
     case "PRODUCT_UPDATE":
       return {
         color:
-          "bg-orange-50 text-orange-800 ring-1 ring-inset ring-orange-600/20",
+          "bg-orange-50 text-orange-800 ring-1 ring-inset ring-orange-600/20 dark:bg-orange-900 dark:text-orange-200 dark:ring-orange-400/20",
         title: "Product update",
       };
     case "PRODUCT_VERSION_UPDATE":
       return {
         color:
-          "bg-purple-50 text-purple-800 ring-1 ring-inset ring-purple-600/20",
+          "bg-purple-50 text-purple-800 ring-1 ring-inset ring-purple-600/20 dark:bg-purple-900 dark:text-purple-200 dark:ring-purple-400/20",
         title: "Product version update",
       };
     case "PRODUCT_DELETE":
       return {
-        color: "bg-red-50 text-red-800 ring-1 ring-inset ring-red-600/20",
+        color:
+          "bg-red-50 text-red-800 ring-1 ring-inset ring-red-600/20 dark:bg-red-900 dark:text-red-200 dark:ring-red-400/20",
         title: "Product deleted",
       };
     case "PRODUCT_VERSION_DELETE":
       return {
-        color: "bg-red-50 text-red-900 ring-1 ring-inset ring-red-600/20",
+        color:
+          "bg-red-50 text-red-900 ring-1 ring-inset ring-red-600/20 dark:bg-red-900 dark:text-red-300 dark:ring-red-400/20",
         title: "Product version deleted",
       };
     case "SUPPLIER_DELETE":
       return {
-        color: "bg-pink-50 text-pink-800 ring-1 ring-inset ring-pink-600/20",
+        color:
+          "bg-pink-50 text-pink-800 ring-1 ring-inset ring-pink-600/20 dark:bg-pink-900 dark:text-pink-200 dark:ring-pink-400/20",
         title: "Supplier deleted",
       };
     case "STOCK_MOVEMENT":
       return {
         color:
-          "bg-indigo-50 text-indigo-800 ring-1 ring-inset ring-indigo-600/20",
+          "bg-indigo-50 text-indigo-800 ring-1 ring-inset ring-indigo-600/20 dark:bg-indigo-900 dark:text-indigo-200 dark:ring-indigo-400/20",
         title: "Stock movement",
       };
     case "USER_ACTION":
       return {
-        color: "bg-gray-50 text-gray-800 ring-1 ring-inset ring-gray-600/20",
+        color:
+          "bg-gray-50 text-gray-800 ring-1 ring-inset ring-gray-600/20 dark:bg-gray-900 dark:text-gray-200 dark:ring-gray-400/20",
         title: "User action",
       };
     default:
       return {
-        color: "bg-gray-50 text-gray-700 ring-1 ring-inset ring-gray-600/20",
+        color:
+          "bg-gray-50 text-gray-700 ring-1 ring-inset ring-gray-600/20 dark:bg-gray-900 dark:text-gray-300 dark:ring-gray-400/20",
         title: "Unknown action",
       };
   }

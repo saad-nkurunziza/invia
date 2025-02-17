@@ -1,7 +1,6 @@
 "use server";
 import { db } from "@/lib/db";
 import { getAuthenticatedUser } from "@/server/auth";
-import { revalidatePath } from "next/cache";
 
 export async function integrateMonthlyStockValue() {
   try {
@@ -72,8 +71,6 @@ export async function integrateMonthlyStockValue() {
           business_id: user.businessId ?? "",
         },
       });
-
-      revalidatePath("/", "layout");
       return {
         status: "success",
         msg: "Monthly stock value integrated successfully",
