@@ -5,22 +5,29 @@ import { getAuthenticatedUser } from "@/server/auth";
 import type { User } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { ApiResponse } from "@/types/api";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+} from "@/utils/api-response";
 
-export async function addUser(user: User, businessId: string) {
+export async function addUser(
+  user: User,
+  businessId: string
+): Promise<ApiResponse> {
   try {
     const authenticatedUser = await getAuthenticatedUser();
-    if (!authenticatedUser) return { error: "User not authenticated" };
-    if (authenticatedUser.role !== "ADMIN") return { error: "Unauthorized" };
+    if (!authenticatedUser)
+      return createErrorResponse("User not authenticated");
+    if (authenticatedUser.role !== "ADMIN")
+      return createErrorResponse("Unauthorized");
 
     const existingUser = await db.user.findUnique({
       where: { email: user.email },
     });
 
     if (existingUser) {
-      return {
-        status: "error",
-        msg: "User with this email already exists",
-      };
+      return createErrorResponse("User with this email already exists");
     }
 
     const newUser = await db.$transaction(async (tx) => {
@@ -39,10 +46,7 @@ export async function addUser(user: User, businessId: string) {
       });
 
       if (!createdUser) {
-        return {
-          status: "error",
-          msg: "Error creating user",
-        };
+        return createErrorResponse("Error creating user");
       }
 
       await tx.log.create({
@@ -54,31 +58,24 @@ export async function addUser(user: User, businessId: string) {
       });
 
       revalidatePath("/", "layout");
-      return {
-        status: "success",
-        msg: "User added successfully",
-        data: createdUser,
-      };
+      return createSuccessResponse("User added successfully", createdUser);
     });
 
     return newUser;
   } catch (error) {
     console.error(error);
-    return {
-      status: "error",
-      msg: `Error adding user `,
-    };
+    return createErrorResponse(`Error adding user`);
   }
 }
 
 export async function editUser(
   userId: string,
   userData: z.infer<typeof UserFormSchemaZod>
-) {
+): Promise<ApiResponse> {
   try {
     const authenticatedUser = await getAuthenticatedUser();
     if (!authenticatedUser)
-      return { status: "error", msg: "User not authenticated" };
+      return createErrorResponse("User not authenticated");
     // if (authenticatedUser.role !== "ADMIN" && authenticatedUser.id !== userId)
     //   return { error: "Unauthorized" };
 
@@ -88,10 +85,7 @@ export async function editUser(
       });
 
       if (!existingUser) {
-        return {
-          status: "error",
-          msg: "No user found",
-        };
+        return createErrorResponse("No user found");
       }
 
       const updatedUser = await tx.user.update({
@@ -100,10 +94,7 @@ export async function editUser(
       });
 
       if (!updatedUser) {
-        return {
-          status: "error",
-          msg: "Failed to update user",
-        };
+        return createErrorResponse("Failed to update user");
       }
 
       await tx.log.create({
@@ -115,30 +106,23 @@ export async function editUser(
       });
 
       revalidatePath("/", "layout");
-      return {
-        status: "success",
-        msg: "User updated successfully",
-        data: updatedUser,
-      };
+      return createSuccessResponse("User updated successfully", updatedUser);
     });
 
     return updatedUser;
   } catch (error) {
     console.error(error);
-    return {
-      status: "error",
-      msg: `Error updating user `,
-    };
+    return createErrorResponse(`Error updating user`);
   }
 }
 
-export async function deleteUser(userId: string) {
+export async function deleteUser(userId: string): Promise<ApiResponse> {
   try {
     const authenticatedUser = await getAuthenticatedUser();
     if (!authenticatedUser)
-      return { status: "error", msg: "User not authenticated" };
+      return createErrorResponse("User not authenticated");
     if (authenticatedUser.role !== "ADMIN")
-      return { status: "error", msg: "Unauthorized" };
+      return createErrorResponse("Unauthorized");
 
     const result = await db.$transaction(async (tx) => {
       const existingUser = await tx.user.findUnique({
@@ -147,10 +131,7 @@ export async function deleteUser(userId: string) {
       });
 
       if (!existingUser) {
-        return {
-          status: "error",
-          msg: "No user found",
-        };
+        return createErrorResponse("No user found");
       }
 
       const deletedUser = await tx.user.update({
@@ -171,19 +152,12 @@ export async function deleteUser(userId: string) {
       });
 
       revalidatePath("/", "layout");
-      return {
-        status: "success",
-        msg: "User deleted successfully",
-        data: deletedUser,
-      };
+      return createSuccessResponse("User deleted successfully", deletedUser);
     });
 
     return result;
   } catch (error) {
     console.error(error);
-    return {
-      status: "error",
-      msg: `Failed to delete user `,
-    };
+    return createErrorResponse(`Failed to delete user`);
   }
 }

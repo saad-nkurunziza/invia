@@ -5,13 +5,17 @@ import { getAuthenticatedUser } from "@/server/auth";
 import type { Supplier } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-
+import { ApiResponse } from "@/types/api";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+} from "@/utils/api-response";
 export async function addSupplier(
   supplier: z.infer<typeof EntrySupplierFormSchema>
-) {
+): Promise<ApiResponse> {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { status: "error", msg: "User not authenticated" };
+    if (!user) return createErrorResponse("User not authenticated");
 
     const existingSupplier = await db.supplier.findFirst({
       where: {
@@ -20,10 +24,7 @@ export async function addSupplier(
       },
     });
     if (existingSupplier) {
-      return {
-        status: "error",
-        msg: "Supplier with this email already exists",
-      };
+      return createErrorResponse("Supplier with this email already exists");
     }
 
     const newSupplier = await db.$transaction(async (tx) => {
@@ -35,10 +36,7 @@ export async function addSupplier(
       });
 
       if (!createdSupplier) {
-        return {
-          status: "error",
-          msg: "Error creating supplier",
-        };
+        return createErrorResponse("Error creating supplier");
       }
 
       await tx.log.create({
@@ -51,30 +49,26 @@ export async function addSupplier(
       });
 
       revalidatePath("/", "layout");
-      return {
-        status: "success",
-        msg: "Supplier added successfully",
-        data: createdSupplier,
-      };
+      return createSuccessResponse(
+        "Supplier added successfully",
+        createdSupplier
+      );
     });
 
     return newSupplier;
   } catch (error) {
     console.error(error);
-    return {
-      status: "error",
-      msg: `Error adding supplier`,
-    };
+    return createErrorResponse(`Error adding supplier`);
   }
 }
 
 export async function editSupplier(
   supplierId: string,
   supplier: Partial<Supplier>
-) {
+): Promise<ApiResponse> {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { status: "error", msg: "User not authenticated" };
+    if (!user) return createErrorResponse("User not authenticated");
 
     const updatedSupplier = await db.$transaction(async (tx) => {
       const existingSupplier = await tx.supplier.findUnique({
@@ -85,10 +79,7 @@ export async function editSupplier(
       });
 
       if (!existingSupplier) {
-        return {
-          status: "error",
-          msg: "No supplier found",
-        };
+        return createErrorResponse("No supplier found");
       }
 
       const updatedSupplier = await tx.supplier.update({
@@ -99,10 +90,7 @@ export async function editSupplier(
       });
 
       if (!updatedSupplier) {
-        return {
-          status: "error",
-          msg: "Failed to update supplier",
-        };
+        return createErrorResponse("Failed to update supplier");
       }
 
       await tx.log.create({
@@ -115,27 +103,23 @@ export async function editSupplier(
       });
 
       revalidatePath("/", "layout");
-      return {
-        status: "success",
-        msg: "Supplier updated successfully",
-        data: updatedSupplier,
-      };
+      return createSuccessResponse(
+        "Supplier updated successfully",
+        updatedSupplier
+      );
     });
 
     return updatedSupplier;
   } catch (error) {
     console.error(error);
-    return {
-      status: "error",
-      msg: `Error updating supplier `,
-    };
+    return createErrorResponse(`Error updating supplier`);
   }
 }
 
-export async function deleteSupplier(supplierId: string) {
+export async function deleteSupplier(supplierId: string): Promise<ApiResponse> {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { status: "error", msg: "User not authenticated" };
+    if (!user) return createErrorResponse("User not authenticated");
 
     const result = await db.$transaction(async (tx) => {
       const supplier = await tx.supplier.findUnique({
@@ -144,17 +128,13 @@ export async function deleteSupplier(supplierId: string) {
       });
 
       if (!supplier) {
-        return {
-          status: "error",
-          msg: `No supplier found with ID: ${supplierId}`,
-        };
+        return createErrorResponse(`No supplier found with ID: ${supplierId}`);
       }
 
       if (supplier.products.length > 0) {
-        return {
-          status: "error",
-          msg: `Supplier with ID: ${supplierId} has associated products and cannot be deleted.`,
-        };
+        return createErrorResponse(
+          `Supplier with ID: ${supplierId} has associated products and cannot be deleted.`
+        );
       }
 
       await tx.supplier.delete({
@@ -172,18 +152,12 @@ export async function deleteSupplier(supplierId: string) {
 
       revalidatePath("/", "layout");
 
-      return {
-        status: "success",
-        msg: "Supplier deleted successfully!",
-      };
+      return createSuccessResponse("Supplier deleted successfully!");
     });
 
     return result;
   } catch (error) {
     console.error(error);
-    return {
-      status: "error",
-      msg: `Failed to delete supplier `,
-    };
+    return createErrorResponse(`Failed to delete supplier`);
   }
 }

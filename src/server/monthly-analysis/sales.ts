@@ -20,20 +20,20 @@ export async function calculateMonthSalesValue(date: Date) {
       },
       select: {
         quantity: true,
-        product: { include: { versions: { select: { buying_price: true } } } },
+        product: { include: { versions: { select: { selling_price: true } } } },
       },
     });
 
-    const marketCapValue = products.reduce((total, product) => {
-      return (
-        total + product.quantity * +product.product.versions[0].buying_price
-      );
+    const salesValue = products.reduce((total, product) => {
+      const sellingPrice = product.product.versions[0]?.selling_price;
+      if (!sellingPrice) return total;
+      return total + product.quantity * +sellingPrice;
     }, 0);
 
     return {
       status: "success",
       msg: "Purchase stock value calculated successfully",
-      data: marketCapValue,
+      data: salesValue,
     };
   } catch (error) {
     console.error(error);

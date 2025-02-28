@@ -29,12 +29,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  fetchActiveBusiness,
-  fetchBusinesses,
-} from "@/server/query/businesses";
 import { Prisma } from "@prisma/client";
 import { BusinessSwitcherSkeleton } from "@/components/skeleton-loaders";
+import { fetcher } from "@/lib/utils";
 
 export type UserBusinessPayload = Prisma.BusinessUserGetPayload<{
   include: {
@@ -48,20 +45,16 @@ export function BusinessSwitcher() {
     data: activeBusiness,
     error: activeError,
     isLoading: activeLoading,
-  } = useSWR<UserBusinessPayload | null>(
-    "/api/active-business",
-    fetchActiveBusiness,
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 60000,
-      shouldRetryOnError: false,
-    }
-  );
+  } = useSWR<UserBusinessPayload | null>(`/api/business/active`, fetcher, {
+    revalidateOnFocus: false,
+    dedupingInterval: 60000,
+    shouldRetryOnError: false,
+  });
   const {
     data: otherBusinesses,
     error: otherError,
     isLoading: otherLoading,
-  } = useSWR<UserBusinessPayload[] | null>("/api/businesses", fetchBusinesses, {
+  } = useSWR<UserBusinessPayload[] | null>(`/api/business/all`, fetcher, {
     revalidateOnFocus: false,
     dedupingInterval: 60000,
     shouldRetryOnError: false,
@@ -71,10 +64,7 @@ export function BusinessSwitcher() {
   const error = activeError || otherError;
 
   const handleBusinessSwitch = async (businessId: string) => {
-    // Implement the logic to switch the active business
     console.log(`Switching to business: ${businessId}`);
-    // You might want to call an API endpoint to update the active business
-    // and then revalidate the SWR cache
   };
 
   if (error) return <BusinessSwitcherSkeleton />;

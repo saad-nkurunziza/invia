@@ -1,38 +1,46 @@
 "use server";
 import { db } from "@/lib/db";
 import { getAuthenticatedUser } from "@/server/auth";
+import { ApiResponse } from "@/types/api";
+import {
+  createSuccessResponse,
+  createErrorResponse,
+} from "@/utils/api-response";
+import { startOfMonth, endOfMonth } from "date-fns";
 
-export async function integrateMonthlyStockValue() {
+export async function integrateMonthlyStockValue(): Promise<ApiResponse> {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { status: "error", msg: "User not authenticated" };
+    if (!user?.businessId) {
+      return createErrorResponse("User not authenticated");
+    }
 
     const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth() + 1;
+    const startDate = startOfMonth(now);
+    const endDate = endOfMonth(now);
 
-    const result = await db.$transaction(async (tx) => {
+    return await db.$transaction(async (tx) => {
       const existingEntry = await tx.analysisStats.findFirst({
         where: {
           key: "monthly_stock_value",
           created_at: {
-            gte: new Date(year, month - 1, 1),
-            lt: new Date(year, month, 1),
+            gte: startDate,
+            lt: endDate,
           },
           business_id: user.businessId,
         },
       });
 
       if (existingEntry) {
-        return {
-          status: "error",
-          msg: "Monthly stock value already integrated for this month",
-        };
+        return createErrorResponse(
+          "Monthly stock value already integrated for this month"
+        );
       }
 
       const stockValue = await tx.product.findMany({
         where: {
           business_id: user.businessId,
+          deleted_at: null,
         },
         select: {
           current_version: {
@@ -45,21 +53,16 @@ export async function integrateMonthlyStockValue() {
       });
 
       const totalValue = stockValue.reduce((total, product) => {
-        if (product.current_version) {
-          return (
-            total +
-            product.current_version.stock *
-              Number(product.current_version.buying_price)
-          );
-        }
-        return total;
+        const version = product.current_version;
+        if (!version?.stock || !version?.buying_price) return total;
+        return total + version.stock * Number(version.buying_price);
       }, 0);
 
       const createdEntry = await tx.analysisStats.create({
         data: {
           key: "monthly_stock_value",
           value: totalValue,
-          created_at: new Date(year, month - 1, 1),
+          created_at: startDate,
           business: { connect: { id: user.businessId } },
         },
       });
@@ -67,35 +70,38 @@ export async function integrateMonthlyStockValue() {
       await tx.log.create({
         data: {
           type: "USER_ACTION",
-          user_id: user.id,
-          business_id: user.businessId ?? "",
+          user_id: user.id!,
+          business_id: user.businessId!,
         },
       });
-      return {
-        status: "success",
-        msg: "Monthly stock value integrated successfully",
-        data: createdEntry,
-      };
-    });
 
-    return result;
+      return createSuccessResponse(
+        "Monthly stock value integrated successfully",
+        createdEntry
+      );
+    });
   } catch (error) {
-    console.error(error);
-    return {
-      status: "error",
-      msg: `Error integrating monthly stock value `,
-    };
+    console.error("Error integrating monthly stock value:", error);
+    return createErrorResponse(
+      error instanceof Error
+        ? error.message
+        : "Error integrating monthly stock value"
+    );
   }
 }
 
-export async function getMonthlyStockValues(months: number) {
+export async function getMonthlyStockValues(
+  months: number
+): Promise<ApiResponse> {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { status: "error", msg: "User not authenticated" };
+    if (!user?.businessId) {
+      return createErrorResponse("User not authenticated");
+    }
 
     const endDate = new Date();
     const startDate = new Date(endDate);
-    startDate.setMonth(startDate.getMonth() - months);
+    startDate.setMonth(startDate.getMonth() - Math.abs(months));
 
     const stockValues = await db.analysisStats.findMany({
       where: {
@@ -111,24 +117,24 @@ export async function getMonthlyStockValues(months: number) {
       },
     });
 
-    return {
-      status: "success",
-      msg: "Monthly stock values retrieved successfully",
-      data: stockValues,
-    };
+    return createSuccessResponse(
+      "Monthly stock values retrieved successfully",
+      stockValues
+    );
   } catch (error) {
-    console.error(error);
-    return {
-      status: "error",
-      msg: `Error retrieving monthly stock values `,
-    };
+    console.error("Error retrieving monthly stock values:", error);
+    return createErrorResponse(
+      error instanceof Error
+        ? error.message
+        : "Error retrieving monthly stock values"
+    );
   }
 }
 
 export async function getTopSellingProducts(
   limit: number,
   period: "week" | "month" | "year"
-) {
+): Promise<ApiResponse> {
   try {
     const user = await getAuthenticatedUser();
     if (!user) return { status: "error", msg: "User not authenticated" };
@@ -189,16 +195,16 @@ export async function getTopSellingProducts(
       };
     });
 
-    return {
-      status: "success",
-      msg: "Top selling products retrieved successfully",
-      data: result,
-    };
+    return createSuccessResponse(
+      "Top selling products retrieved successfully",
+      result
+    );
   } catch (error) {
     console.error(error);
-    return {
-      status: "error",
-      msg: `Error retrieving top selling products `,
-    };
+    return createErrorResponse(
+      error instanceof Error
+        ? error.message
+        : "Error retrieving top selling products"
+    );
   }
 }

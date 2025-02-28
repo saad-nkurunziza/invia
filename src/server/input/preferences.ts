@@ -1,18 +1,24 @@
 "use server";
 import { db } from "@/lib/db";
 import { getAuthenticatedUser } from "@/server/auth";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+} from "@/utils/api-response";
 import { revalidatePath } from "next/cache";
+import { ApiResponse } from "@/types/api";
 
-export async function saveStockName(formData: FormData): Promise<void> {
+export async function saveStockName(
+  formData: FormData
+): Promise<ApiResponse | undefined> {
   const stockName = formData.get("stock_name") as string;
 
   try {
     const user = await getAuthenticatedUser();
     if (!user) {
       console.error("User not authenticated");
-      return;
+      return createErrorResponse("User not authenticated");
     }
-
     await db.$transaction(async (tx) => {
       await tx.preference.upsert({
         where: {
@@ -42,16 +48,19 @@ export async function saveStockName(formData: FormData): Promise<void> {
     });
   } catch (error) {
     console.error("Error saving stock name:", error);
+    return createErrorResponse("Error saving stock name");
   }
 }
 
-export async function saveThresholdMargin(formData: FormData): Promise<void> {
+export async function saveThresholdMargin(
+  formData: FormData
+): Promise<ApiResponse | undefined> {
   const thresholdMargin = formData.get("stock_name") as string;
   try {
     const user = await getAuthenticatedUser();
     if (!user) {
       console.error("User not authenticated");
-      return;
+      return createErrorResponse("User not authenticated");
     }
 
     await db.$transaction(async (tx) => {
@@ -84,13 +93,14 @@ export async function saveThresholdMargin(formData: FormData): Promise<void> {
     });
   } catch (error) {
     console.error(error);
+    return createErrorResponse("Error saving threshold margin");
   }
 }
 
-export async function getPreferences() {
+export async function getPreferences(): Promise<ApiResponse | undefined> {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { status: "error", msg: "User not authenticated" };
+    if (!user) return createErrorResponse("User not authenticated");
 
     const preferences = await db.preference.findMany({
       where: {
@@ -98,16 +108,14 @@ export async function getPreferences() {
       },
     });
 
-    return {
-      status: "success",
-      msg: "Preferences retrieved successfully",
-      data: preferences,
-    };
+    return createSuccessResponse(
+      "Preferences retrieved successfully",
+      preferences
+    );
   } catch (error) {
     console.error(error);
-    return {
-      status: "error",
-      msg: `Error retrieving preferences `,
-    };
+    return createErrorResponse(
+      error instanceof Error ? error.message : "Error retrieving preferences"
+    );
   }
 }

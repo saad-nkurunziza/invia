@@ -2,14 +2,18 @@
 import { db } from "@/lib/db";
 import { getAuthenticatedUser } from "@/server/auth";
 import { revalidatePath } from "next/cache";
-
+import { ApiResponse } from "@/types/api";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+} from "@/utils/api-response";
 export async function deductProductQuantity(
   productId: string,
   quantity: number
-) {
+): Promise<ApiResponse> {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { status: "error", msg: "User not authenticated" };
+    if (!user) return createErrorResponse("User not authenticated");
 
     const result = await db.$transaction(async (tx) => {
       const existingProduct = await tx.product.findFirst({
@@ -18,24 +22,19 @@ export async function deductProductQuantity(
       });
 
       if (!existingProduct || !existingProduct.current_version) {
-        return {
-          status: "error",
-          msg: `No product found with ID: ${productId}`,
-        };
+        return createErrorResponse(`No product found with ID: ${productId}`);
       }
 
       if (existingProduct.current_version.stock < quantity) {
-        return {
-          status: "error",
-          msg: `Insufficient stock for product with ID: ${productId}`,
-        };
+        return createErrorResponse(
+          `Insufficient stock for product with ID: ${productId}`
+        );
       }
 
       if (existingProduct.current_version.status === "OUT_OF_STOCK") {
-        return {
-          status: "error",
-          msg: `Product with ID: ${productId} is out of stock`,
-        };
+        return createErrorResponse(
+          `Product with ID: ${productId} is out of stock`
+        );
       }
 
       const updatedProduct = await tx.productVersion.update({
@@ -49,10 +48,7 @@ export async function deductProductQuantity(
       });
 
       if (!updatedProduct) {
-        return {
-          status: "error",
-          msg: `Error updating product stock`,
-        };
+        return createErrorResponse(`Error updating product stock`);
       }
 
       const stockMovement = await tx.stockMovement.create({
@@ -75,20 +71,16 @@ export async function deductProductQuantity(
       });
 
       revalidatePath("/", "layout");
-      return {
-        status: "success",
-        msg: `Stock deducted successfully`,
-        data: { updatedProduct, stockMovement },
-      };
+      return createSuccessResponse("Stock deducted successfully", {
+        updatedProduct,
+        stockMovement,
+      });
     });
 
     return result;
   } catch (error) {
     console.error(error);
-    return {
-      status: "error",
-      msg: `Error deducting stock `,
-    };
+    return createErrorResponse(`Error deducting stock`);
   }
 }
 
@@ -96,10 +88,10 @@ export async function deductProductQuantity(
 export async function incrementProductQuantity(
   productId: string,
   quantity: number
-) {
+): Promise<ApiResponse> {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { status: "error", msg: "User not authenticated" };
+    if (!user) return createErrorResponse("User not authenticated");
 
     const result = await db.$transaction(async (tx) => {
       const existingProduct = await tx.product.findFirst({
@@ -108,10 +100,7 @@ export async function incrementProductQuantity(
       });
 
       if (!existingProduct || !existingProduct.current_version) {
-        return {
-          status: "error",
-          msg: `No product found with ID: ${productId}`,
-        };
+        return createErrorResponse(`No product found with ID: ${productId}`);
       }
 
       const updatedProduct = await tx.productVersion.update({
@@ -125,10 +114,7 @@ export async function incrementProductQuantity(
       });
 
       if (!updatedProduct) {
-        return {
-          status: "error",
-          msg: `Error updating product stock`,
-        };
+        return createErrorResponse(`Error updating product stock`);
       }
 
       const stockMovement = await tx.stockMovement.create({
@@ -151,19 +137,15 @@ export async function incrementProductQuantity(
       });
 
       revalidatePath("/", "layout");
-      return {
-        status: "success",
-        msg: `Stock incremented successfully`,
-        data: { updatedProduct, stockMovement },
-      };
+      return createSuccessResponse("Stock incremented successfully", {
+        updatedProduct,
+        stockMovement,
+      });
     });
 
     return result;
   } catch (error) {
     console.error(error);
-    return {
-      status: "error",
-      msg: `Error incrementing stock `,
-    };
+    return createErrorResponse(`Error incrementing stock`);
   }
 }

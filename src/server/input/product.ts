@@ -5,12 +5,17 @@ import { db } from "@/lib/db";
 import { getAuthenticatedUser } from "@/server/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+} from "@/utils/api-response";
+import { ApiResponse } from "@/types/api";
 export async function addProduct(
   product: z.infer<typeof CreateProductFormSchema>
-) {
+): Promise<ApiResponse> {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { status: "error", msg: "User not authenticated" };
+    if (!user) return createErrorResponse("User not authenticated");
 
     const existingProduct = await db.product.findFirst({
       where: {
@@ -35,10 +40,7 @@ export async function addProduct(
     });
 
     if (existingProduct) {
-      return {
-        status: "error",
-        msg: "Product exists already",
-      };
+      return createErrorResponse("Product exists already");
     }
 
     const newProduct = await db.$transaction(async (tx) => {
@@ -79,10 +81,7 @@ export async function addProduct(
         },
       });
       if (!createdProduct) {
-        return {
-          status: "error",
-          msg: "Error creating product",
-        };
+        return createErrorResponse("Error creating product");
       }
 
       await tx.log.create({
@@ -96,29 +95,25 @@ export async function addProduct(
       });
 
       revalidatePath("/", "layout");
-      return {
-        status: "success",
-        msg: "Product added successfully",
-        data: createdProduct,
-      };
+      return createSuccessResponse(
+        "Product added successfully",
+        createdProduct
+      );
     });
 
     return newProduct;
   } catch (error) {
     console.error(error);
-    return {
-      status: "error",
-      msg: `Error adding supplier`,
-    };
+    return createErrorResponse(`Error adding supplier`);
   }
 }
 
 export async function createProductVersion(
   input: z.infer<typeof CreateProductVersionFormSchema>
-) {
+): Promise<ApiResponse> {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { status: "error", msg: "User not authenticated" };
+    if (!user) return createErrorResponse("User not authenticated");
 
     const existingProduct = await db.product.findFirst({
       where: {
@@ -131,10 +126,7 @@ export async function createProductVersion(
       },
     });
     if (!existingProduct) {
-      return {
-        status: "error",
-        msg: "Product missing",
-      };
+      return createErrorResponse("Product missing");
     }
     const existingVersion = await db.product.findFirst({
       where: {
@@ -159,10 +151,7 @@ export async function createProductVersion(
     });
 
     if (existingVersion) {
-      return {
-        status: "error",
-        msg: "Product version exists already",
-      };
+      return createErrorResponse("Product version exists already");
     }
 
     const latestVersion = existingProduct.versions[0];
@@ -196,30 +185,26 @@ export async function createProductVersion(
       });
 
       revalidatePath("/", "layout");
-      return {
-        status: "success",
-        msg: "Product version added successfully",
-        data: createdVersion,
-      };
+      return createSuccessResponse(
+        "Product version added successfully",
+        createdVersion
+      );
     });
 
     return newVersion;
   } catch (error) {
     console.error(error);
-    return {
-      status: "error",
-      msg: `Error adding product version `,
-    };
+    return createErrorResponse(`Error adding product version`);
   }
 }
 
 export async function editProduct(
   productId: string,
   product: z.infer<typeof CreateProductFormSchema>
-) {
+): Promise<ApiResponse> {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { status: "error", msg: "User not authenticated" };
+    if (!user) return createErrorResponse("User not authenticated");
 
     const updatedProduct = await db.$transaction(async (tx) => {
       const existingProduct = await tx.product.findUnique({
@@ -230,10 +215,7 @@ export async function editProduct(
       });
 
       if (!existingProduct) {
-        return {
-          status: "error",
-          msg: "No product found",
-        };
+        return createErrorResponse("No product found");
       }
 
       const updatedProduct = await tx.product.update({
@@ -253,10 +235,7 @@ export async function editProduct(
       });
 
       if (!updatedProduct) {
-        return {
-          status: "error",
-          msg: "Failed to update product",
-        };
+        return createErrorResponse("Failed to update product");
       }
 
       await tx.log.create({
@@ -270,27 +249,23 @@ export async function editProduct(
       });
 
       revalidatePath("/", "layout");
-      return {
-        status: "success",
-        msg: "Product updated successfully",
-        data: updatedProduct,
-      };
+      return createSuccessResponse(
+        "Product updated successfully",
+        updatedProduct
+      );
     });
 
     return updatedProduct;
   } catch (error) {
     console.error(error);
-    return {
-      status: "error",
-      msg: `Error updating product `,
-    };
+    return createErrorResponse(`Error updating product`);
   }
 }
 
-export async function deleteProduct(productId: string) {
+export async function deleteProduct(productId: string): Promise<ApiResponse> {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return { status: "error", msg: "User not authenticated" };
+    if (!user) return createErrorResponse("User not authenticated");
 
     const result = await db.$transaction(async (tx) => {
       const product = await tx.product.findUnique({
@@ -299,20 +274,16 @@ export async function deleteProduct(productId: string) {
       });
 
       if (!product) {
-        return {
-          status: "error",
-          msg: `No product found with ID: ${productId}`,
-        };
+        return createErrorResponse(`No product found with ID: ${productId}`);
       }
 
       const hasSales = product.transactions.some(
         (transaction) => transaction.type === "OUT"
       );
       if (hasSales) {
-        return {
-          status: "error",
-          msg: `Product with ID: ${productId} has sales transactions and cannot be deleted.`,
-        };
+        return createErrorResponse(
+          `Product with ID: ${productId} has sales transactions and cannot be deleted.`
+        );
       }
 
       await tx.product.delete({
@@ -331,18 +302,12 @@ export async function deleteProduct(productId: string) {
 
       revalidatePath("/", "layout");
 
-      return {
-        status: "success",
-        msg: "Product deleted successfully!",
-      };
+      return createSuccessResponse("Product deleted successfully!");
     });
 
     return result;
   } catch (error) {
     console.error(error);
-    return {
-      status: "error",
-      msg: `Failed to delete product `,
-    };
+    return createErrorResponse(`Failed to delete product`);
   }
 }
