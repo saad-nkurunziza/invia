@@ -20,5 +20,3 @@ The Stock Management App is designed to help businesses efficiently manage their
 ## Contact
 
 For any questions or feedback, please contact [saddynkuruziza8@gmail.com](mailto:saddynkuruziza8@gmail.com).
-# invia
-# invia

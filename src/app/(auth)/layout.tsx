@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import SignInOutText from "@/components/auth/sign-in-out-text";
-import ContinueWithGithub from "@/components/auth/continue-with-github";
 export const metadata: Metadata = {
   title: "Authentication",
 };
@@ -23,15 +22,6 @@ export default function AuthLayout({
         <SignInOutText />
         <div className="my-3" />
         {children}
-        <div className="mt-4 mb-5">
-          <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-            <span className="relative z-10 bg-background px-2 text-muted-foreground">
-              Or continue with
-            </span>
-          </div>
-          <div className="my-3" />
-          <ContinueWithGithub />
-        </div>
       </div>
 
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-muted to-muted/75 items-center justify-center">

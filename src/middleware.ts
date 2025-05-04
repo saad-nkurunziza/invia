@@ -1,11 +1,11 @@
-import NextAuth from "next-auth";
-import { authConfig } from "@/auth.config";
 import * as routes from "@/routes";
-const { auth } = NextAuth(authConfig);
+import { getSessionCookie } from "better-auth/cookies";
+import { NextRequest } from "next/server";
 
-export default auth((req) => {
+export async function middleware(req: NextRequest) {
+  const sessionCookie = getSessionCookie(req);
+  const isLoggedIn = !!sessionCookie;
   const { nextUrl } = req;
-  const isLoggedIn = !!req.auth;
 
   const isApiAuthRoute = nextUrl.pathname.startsWith(routes.apiAuthPrefix);
   const isPublicRoute = routes.publicRoutes.includes(nextUrl.pathname);
@@ -28,7 +28,7 @@ export default auth((req) => {
   }
 
   return;
-});
+}
 
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],

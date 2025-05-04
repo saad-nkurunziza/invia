@@ -3,12 +3,15 @@ import OnboardingCreateForm from "@/components/onboarding/onboarding-create";
 import OnboardingJoinForm from "@/components/onboarding/onboarding-join";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 
 const OnboardingPage = async (props: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) => {
   const searchParams = await props.searchParams;
-  const session = await auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
   if (session?.user.businessId) {
     redirect("/dashboard");
   }

@@ -4,12 +4,15 @@ import { db } from "@/lib/db";
 import { AuthResponse } from "@/auth-types";
 import { z } from "zod";
 import { OnboardingJoinSchema } from "@/components/onboarding/onboarding-join";
+import { headers } from "next/headers";
 
 export const join = async (
   values: z.infer<typeof OnboardingJoinSchema>
 ): Promise<AuthResponse> => {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
     if (!session || !session.user || !session.user.id) {
       return { error: "Unauthorized" };
     }
