@@ -57,7 +57,7 @@ const page = () => {
               <TabsContent
                 key={item.name}
                 value={item.name}
-                className="h-full p-6 max-h-[80vh] focus-visible:outline-none focus-visible:ring-0"
+                className="h-full p-6 max-h-[80vh] focus-visible:outline-hidden focus-visible:ring-0"
               >
                 <div className="mx-auto pb-6 max-w-2xl space-y-6">
                   <item.component />

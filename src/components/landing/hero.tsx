@@ -3,9 +3,12 @@ import Image from "next/image";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { headers } from "next/headers";
 
 export async function Hero() {
-  const session = await auth();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
   if (session?.user.id) {
     redirect("/dashboard");
   }

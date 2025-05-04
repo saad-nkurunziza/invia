@@ -4,7 +4,7 @@ import React from "react";
 
 const BottomNav = () => {
   return (
-    <div className="fixed backdrop-blur-sm bottom-0 flex md:hidden h-12 items-center gap-4 border-t bg-muted/40 px-4 w-dvw">
+    <div className="fixed backdrop-blur-xs bottom-0 flex md:hidden h-12 items-center gap-4 border-t bg-muted/40 px-4 w-dvw">
       <div className="flex justify-around w-full">
         {links.map((link) => (
           <Link

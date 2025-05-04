@@ -24,7 +24,7 @@ export default function AuthLayout({
         {children}
       </div>
 
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-muted to-muted/75 items-center justify-center">
+      <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-muted to-muted/75 items-center justify-center">
         <div className="text-left max-w-md px-6">
           <blockquote className="text-lg text-muted-foreground p-4 italic">
             &quot;Unlock the full potential of your business with our

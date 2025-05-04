@@ -21,7 +21,7 @@ const Card: React.FC<CardProps> = ({
   return (
     <div className="bg-card border shadow-md rounded-lg p-6 w-full">
       <div className="flex items-center">
-        <div className="flex-shrink-0">{icon}</div>
+        <div className="shrink-0">{icon}</div>
         <div className="ml-4">
           <h2 className="text-lg font-semibold text-foreground">{title}</h2>
           <p className="text-muted-foreground">{span}</p>

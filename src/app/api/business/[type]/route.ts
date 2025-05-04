@@ -2,8 +2,14 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getAuthenticatedUser } from "@/server/auth";
 
-export async function GET(req: Request) {
-  const { type } = await req.json();
+// export const dynamic = "force-static";
+// export const revalidate = 3600;
+
+export async function GET(
+  req: Request,
+  { params }: { params: Promise<{ type: string }> }
+) {
+  const type = (await params).type;
   if (type === "all") {
     try {
       const user = await getAuthenticatedUser();
@@ -11,7 +17,9 @@ export async function GET(req: Request) {
       const businesses = await db.businessUser.findMany({
         where: {
           user_id: user.id,
-          business_id: { not: user.businessId },
+          ...(user.businessId && {
+            business_id: { not: user.businessId },
+          }),
         },
         include: {
           business: true,
@@ -25,7 +33,7 @@ export async function GET(req: Request) {
   } else if (type === "active") {
     try {
       const user = await getAuthenticatedUser();
-      if (!user) return null;
+      if (!user) return NextResponse.json(null);
       const business = await db.businessUser.findUnique({
         where: {
           user_id_business_id: {

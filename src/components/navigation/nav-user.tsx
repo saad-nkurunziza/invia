@@ -18,8 +18,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { signOut, useSession } from "@/lib/auth-client";
 // import { signOut } from "@/lib/auth";
-import { signOut, useSession } from "next-auth/react";
 // import { SettingsDialog } from "../settings/settings-dialog";
 // import { Button } from "../ui/button";
 // import { Button } from "../ui/button";
@@ -55,7 +55,7 @@ export function NavUser() {
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}

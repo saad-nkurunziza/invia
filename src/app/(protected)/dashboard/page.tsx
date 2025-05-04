@@ -17,11 +17,10 @@ import RecentLogs from "./recent-logs";
 const page = async () => {
   const recent_sales_statistics = await getSalesStatistics();
   // const recent_purchase_statistics = await getPurchaseStatistics();
-  console.log({ recent_sales_statistics });
   return (
     <div className="space-y-8 flex flex-col justify-center">
       <TitleContainer title="Your Stock Stats">
-        <div className="bg-transparent border-none backdrop-blur grid gap-2 md:grid-cols-4">
+        <div className="bg-transparent border-none backdrop-blur-sm grid gap-2 md:grid-cols-4">
           <CurrentStat />
         </div>
       </TitleContainer>
@@ -33,12 +32,12 @@ const page = async () => {
             <TabsTrigger value="month">Month</TabsTrigger>
           </TabsList>
           <TabsContent value="day">
-            <Card className="bg-transparent border-none backdrop-blur grid gap-2 md:grid-cols-4">
+            <Card className="bg-transparent border-none backdrop-blur-sm grid gap-2 md:grid-cols-4">
               <CompareStatDaily />
             </Card>
           </TabsContent>
           <TabsContent value="month">
-            <Card className="bg-transparent border-none backdrop-blur grid gap-2 md:grid-cols-4">
+            <Card className="bg-transparent border-none backdrop-blur-sm grid gap-2 md:grid-cols-4">
               <CompareStatMonthly />
             </Card>
           </TabsContent>

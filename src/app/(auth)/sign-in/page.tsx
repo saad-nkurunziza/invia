@@ -31,7 +31,7 @@ export default function SignIn() {
               "justify-between flex-col"
             )}
           >
-            <Button
+            {/* <Button
               variant="outline"
               className={cn("w-full gap-2")}
               disabled={loading}
@@ -76,7 +76,7 @@ export default function SignIn() {
                 ></path>
               </svg>
               Sign in with Google
-            </Button>
+            </Button> */}
             <Button
               variant="outline"
               className={cn("w-full gap-2")}

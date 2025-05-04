@@ -3,29 +3,26 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { db } from "./db";
 import { nextCookies } from "better-auth/next-js";
 import { customSession } from "better-auth/plugins";
+import { getUserById } from "@/server/user";
 
 export const auth = betterAuth({
   appName: "Invia",
   socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    },
     github: {
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     },
   },
+
   plugins: [
     nextCookies(),
     customSession(async ({ user, session }) => {
-      // const roles = findUserRoles(session.session.userId);
+      const fetchedUser = await getUserById(session.userId);
       return {
-        // roles,
         user: {
           ...user,
-          businessId: "newField",
-          role: "newField",
+          businessId: fetchedUser?.businesses?.[0]?.business_id ?? null,
+          role: fetchedUser?.role,
         },
         session,
       };
@@ -34,4 +31,13 @@ export const auth = betterAuth({
   database: prismaAdapter(db, {
     provider: "postgresql",
   }),
+
+  usePlural: true,
+  user: {
+    modelName: "User",
+    fields: {
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+    },
+  },
 });

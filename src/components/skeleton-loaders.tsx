@@ -54,7 +54,7 @@ export function NavUserSkeleton() {
 
 export function BusinessSwitcherSkeleton() {
   return (
-    <Skeleton className="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 group-has- opacity-80 h-12 text-sm group-data-[collapsible=icon]:!p-0">
+    <Skeleton className="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 group-has- opacity-80 h-12 text-sm group-data-[collapsible=icon]:p-0!">
       <Skeleton className="flex aspect-square size-8 items-center justify-center rounded-lg opacity-75">
         <Skeleton className="size-4" />
       </Skeleton>

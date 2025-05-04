@@ -16,7 +16,7 @@ export default function MoreInfo({ children }: { children: ReactNode }) {
           <Button
             variant="ghost"
             size={"icon"}
-            className=" outline-none focus:outline-none focus-within:outline-none"
+            className=" outline-hidden focus:outline-hidden focus-within:outline-hidden"
           >
             <InformationCircleIcon className="h-3 w-3" />
           </Button>

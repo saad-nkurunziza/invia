@@ -1,4 +1,5 @@
 "use server";
+
 import { db } from "@/lib/db";
 import { getAuthenticatedUser } from "@/server/auth";
 import { Prisma } from "@prisma/client";
@@ -20,7 +21,7 @@ export async function fetchProducts(date?: Date) {
 
     const products = await db.product.findMany({
       where: {
-        business_id: user.businessId,
+        business_id: user.businessId ?? "",
         deleted_at: null,
         ...whereClause,
       },
@@ -60,7 +61,7 @@ export async function fetchProductById(productId: string) {
     const product = await db.product.findUnique({
       where: {
         id: productId,
-        business_id: user.businessId,
+        business_id: user.businessId ?? "",
         deleted_at: null,
       },
       include: { current_version: true, versions: true },
@@ -103,7 +104,7 @@ export async function fetchProductsExtended(date?: Date) {
 
     const products = await db.product.findMany({
       where: {
-        business_id: user.businessId,
+        business_id: user.businessId ?? "",
         deleted_at: null,
         ...whereClause,
       },
@@ -153,7 +154,7 @@ export async function fetchProductCategories(category: string, date?: Date) {
 
     const categories = await db.product.findMany({
       where: {
-        business_id: user.businessId,
+        business_id: user.businessId ?? "",
         deleted_at: null,
         current_version: { category },
         ...whereClause,
@@ -197,7 +198,7 @@ export async function fetchLowStockProducts(date?: Date) {
 
     const lowStockProducts = await db.product.findMany({
       where: {
-        business_id: user.businessId,
+        business_id: user.businessId ?? "",
         deleted_at: null,
         current_version: {
           stock: { lte: margin_value },
@@ -241,7 +242,7 @@ export async function fetchInStockProducts(date?: Date) {
 
     const lowStockProducts = await db.product.findMany({
       where: {
-        business_id: user.businessId,
+        business_id: user.businessId ?? "",
         deleted_at: null,
         current_version: {
           stock: { gt: 0 },
@@ -285,7 +286,7 @@ export async function fetchOutStockProducts(date?: Date) {
 
     const lowStockProducts = await db.product.findMany({
       where: {
-        business_id: user.businessId,
+        business_id: user.businessId ?? "",
         deleted_at: null,
         current_version: {
           stock: { lte: 0 },
@@ -331,7 +332,7 @@ export async function fetchProductStockHistory(productId: string, date?: Date) {
     const stockHistory = await db.stockMovement.findMany({
       where: {
         product_id: productId,
-        business_id: user.businessId,
+        business_id: user.businessId ?? "",
         ...whereClause,
       },
       orderBy: { created_at: "desc" },
@@ -373,7 +374,7 @@ export async function fetchProductLogHistory(productId: string, date?: Date) {
     const logHistory = await db.log.findMany({
       where: {
         product_id: productId,
-        business_id: user.businessId,
+        business_id: user.businessId ?? "",
         ...whereClause,
       },
       orderBy: { created_at: "desc" },
@@ -420,7 +421,7 @@ export async function fetchProductsNearingExpiry(
 
     const productsNearingExpiry = await db.product.findMany({
       where: {
-        business_id: user.businessId,
+        business_id: user.businessId ?? "",
         deleted_at: null,
         versions: {
           some: {
@@ -465,7 +466,7 @@ export async function fetchProductPerformanceComparison(productId: string) {
         _sum: { quantity: true },
         where: {
           product_id: productId,
-          business_id: user.businessId,
+          business_id: user.businessId ?? "",
           type: "OUT",
           created_at: {
             gte: startOfMonth(currentMonth),
@@ -477,7 +478,7 @@ export async function fetchProductPerformanceComparison(productId: string) {
         _sum: { quantity: true },
         where: {
           product_id: productId,
-          business_id: user.businessId,
+          business_id: user.businessId ?? "",
           type: "OUT",
           created_at: {
             gte: startOfMonth(lastMonth),

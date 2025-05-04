@@ -18,7 +18,7 @@ export default function QuickAccessBar() {
 
   return (
     <TooltipProvider>
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border rounded-full shadow-lg px-2 py-1.5 flex items-center gap-1">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/60 border rounded-full shadow-lg px-2 py-1.5 flex items-center gap-1">
         {quickActions.map((action, index) => (
           <Tooltip key={index} delayDuration={0}>
             <TooltipTrigger asChild>

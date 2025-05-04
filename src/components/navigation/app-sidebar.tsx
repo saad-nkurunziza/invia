@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/sidebar";
 import { NavUtilities } from "./nav-utilities";
 import { BusinessSwitcherSkeleton, NavUserSkeleton } from "../skeleton-loaders";
+import { Currency } from "@prisma/client";
 
 const data = {
   navMain: [
@@ -133,11 +134,30 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const businessInitialData = {
+    user_id: "",
+    business_id: "",
+    join_date: new Date(),
+    last_access: new Date(),
+    deleted_at: null,
+    business: {
+      name: "string",
+      deleted_at: new Date(),
+      email: "string",
+      id: "string",
+      registration_number: "string",
+      address: "",
+      tel: "",
+      currency: Currency.USD,
+      created_at: new Date(),
+      updated_at: new Date(),
+    },
+  };
   return (
     <Sidebar {...props}>
       <SidebarHeader>
         <React.Suspense fallback={<BusinessSwitcherSkeleton />}>
-          <BusinessSwitcher />
+          <BusinessSwitcher initialData={businessInitialData} />
         </React.Suspense>
       </SidebarHeader>
       <SidebarContent className="scrollbar-hide">

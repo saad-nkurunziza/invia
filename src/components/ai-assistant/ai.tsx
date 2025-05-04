@@ -86,8 +86,8 @@ export default function AIAssistant() {
         <CardHeader>
           <CardTitle>AI Assistant</CardTitle>
         </CardHeader>
-        <CardContent className="flex-grow flex flex-col">
-          <ScrollArea className="flex-grow mb-4">
+        <CardContent className="grow flex flex-col">
+          <ScrollArea className="grow mb-4">
             {messages.map((message) => (
               <div
                 key={message.id}
