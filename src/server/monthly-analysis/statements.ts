@@ -3,80 +3,76 @@ import { getAuthenticatedUser } from "@/server/auth";
 import { startOfMonth, endOfMonth, addMonths } from "date-fns";
 import { unstable_cache } from "next/cache";
 
-export const getMostSoldProducts = unstable_cache(
-  async (date: Date) => {
-    try {
-      const user = await getAuthenticatedUser();
-      if (!user) return { status: "error", msg: "User not authenticated" };
+export const getMostSoldProducts = async (date: Date) => {
+  try {
+    const user = await getAuthenticatedUser();
+    if (!user) return { status: "error", msg: "User not authenticated" };
 
-      const startOfThisMonth = startOfMonth(date);
-      const endOfThisMonth = endOfMonth(date);
+    const startOfThisMonth = startOfMonth(date);
+    const endOfThisMonth = endOfMonth(date);
 
-      const mostSoldProducts = await db.stockMovement.groupBy({
-        by: ["product_id"],
-        where: {
-          business_id: user.businessId,
-          type: "OUT",
-          created_at: {
-            gte: startOfThisMonth,
-            lt: endOfThisMonth,
-          },
+    const mostSoldProducts = await db.stockMovement.groupBy({
+      by: ["product_id"],
+      where: {
+        business_id: user.businessId,
+        type: "OUT",
+        created_at: {
+          gte: startOfThisMonth,
+          lt: endOfThisMonth,
         },
+      },
+      _sum: {
+        quantity: true,
+      },
+      orderBy: {
         _sum: {
-          quantity: true,
+          quantity: "desc",
         },
-        orderBy: {
-          _sum: {
-            quantity: "desc",
-          },
-        },
-        take: 4,
-      });
+      },
+      take: 4,
+    });
 
-      if (!mostSoldProducts.length || !mostSoldProducts[0].product_id) {
-        return {
-          status: "success",
-          msg: "No product data available",
-          data: {
-            mostSoldProducts: [
-              {
-                productName: "No Product Data Available",
-                quantity: 0,
-              },
-            ],
-          },
-        };
-      }
-
-      const products = await Promise.all(
-        mostSoldProducts.map(async (product) => {
-          const productDetails = await db.product.findUnique({
-            where: { id: product.product_id },
-            select: { name: true },
-          });
-          return {
-            productName: productDetails?.name || "Unknown Product",
-            quantity: product._sum.quantity || 0,
-          };
-        })
-      );
-
+    if (!mostSoldProducts.length || !mostSoldProducts[0].product_id) {
       return {
         status: "success",
-        msg: "Most sold products retrieved successfully",
-        data: products,
-      };
-    } catch (error) {
-      console.error(error);
-      return {
-        status: "error",
-        msg: "Error calculating most sold products",
+        msg: "No product data available",
+        data: {
+          mostSoldProducts: [
+            {
+              productName: "No Product Data Available",
+              quantity: 0,
+            },
+          ],
+        },
       };
     }
-  },
-  ["most-sold-products"],
-  { revalidate: 3600, tags: ["products"] }
-);
+
+    const products = await Promise.all(
+      mostSoldProducts.map(async (product) => {
+        const productDetails = await db.product.findUnique({
+          where: { id: product.product_id },
+          select: { name: true },
+        });
+        return {
+          productName: productDetails?.name || "Unknown Product",
+          quantity: product._sum.quantity || 0,
+        };
+      })
+    );
+
+    return {
+      status: "success",
+      msg: "Most sold products retrieved successfully",
+      data: products,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      status: "error",
+      msg: "Error calculating most sold products",
+    };
+  }
+};
 
 export const getLeastSoldProduct = unstable_cache(
   async (date: Date) => {

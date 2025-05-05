@@ -3,19 +3,20 @@ import TitleContainer from "@/components/containers/title-container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CurrentStat from "./current-stat";
 import { Card } from "@/components/ui/card";
-import // getPurchaseStatistics,
-// getSalesStatistics,
-"@/server/services/chart-data";
+import {
+  getPurchaseStatistics,
+  getSalesStatistics,
+} from "@/server/services/chart-data";
 import CompareStatDaily from "./daily-stat";
 import CompareStatMonthly from "./monthly-stat";
-// import { Watchlists } from "./watchlist";
+import { Watchlists } from "./watchlist";
 import RecentTransactions from "./recent-transactions";
 import RecentLogs from "./recent-logs";
-// import MostSold from "./most-sold";
+import MostSold from "./most-sold";
 
 const page = async () => {
-  // const recent_sales_statistics = await getSalesStatistics();
-  // const recent_purchase_statistics = await getPurchaseStatistics();
+  const recent_sales_statistics = await getSalesStatistics();
+  const recent_purchase_statistics = await getPurchaseStatistics();
   return (
     <div className="space-y-8 flex flex-col justify-center">
       <TitleContainer title="Your Stock Stats">
@@ -42,7 +43,7 @@ const page = async () => {
           </TabsContent>
         </Tabs>
       </TitleContainer>
-      {/* 
+
       <div className="hidden md:grid md:grid-cols-3 grid-cols-1 gap-6">
         <div className="col-span-3">
           <TitleContainer title="Stock Watchlists">
@@ -66,12 +67,18 @@ const page = async () => {
             </Tabs>
           </TitleContainer>
         </div>
-      </div> */}
+      </div>
       <TitleContainer title="Recent entries">
-        <RecentTransactions />
+        <div className="flex w-full gap-2">
+          <div className="w-2/3">
+            <RecentTransactions />
+          </div>
+          <div className="w-1/3">
+            <MostSold />
+          </div>
+        </div>
         <RecentLogs />
       </TitleContainer>
-      <div className="grid auto-rows-auto gap-6">{/* <MostSold /> */}</div>
     </div>
   );
 };

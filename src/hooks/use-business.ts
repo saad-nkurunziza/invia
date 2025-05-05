@@ -40,7 +40,6 @@ export function useBusinessData(): UseBusinessDataReturn {
     dedupingInterval: 300000,
     errorRetryCount: isOnline ? 3 : 0,
   });
-  console.log({ activeBusiness });
   return {
     activeBusiness,
     otherBusinesses,

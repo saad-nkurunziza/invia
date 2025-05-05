@@ -104,9 +104,9 @@ const CompareStatMonthly = async () => {
     const percentageIncrease = parseFloat(increase);
 
     return percentageIncrease > 0
-      ? { color: "text-green-500", Icon: ArrowTrendingUpIcon }
+      ? { color: "text-emerald-500", Icon: ArrowTrendingUpIcon }
       : percentageIncrease < 0
-      ? { color: "text-red-500", Icon: ArrowTrendingDownIcon }
+      ? { color: "text-muted-foreground", Icon: ArrowTrendingDownIcon }
       : { color: "text-gray-500", Icon: ArrowsRightLeftIcon };
   };
 

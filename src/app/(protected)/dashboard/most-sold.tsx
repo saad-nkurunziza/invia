@@ -18,6 +18,7 @@ import { getMostSoldProducts } from "@/server/monthly-analysis/statements";
 
 const MostSold = async () => {
   const most_sold_products = await getMostSoldProducts(new Date());
+  console.log({ most_sold_products });
   if (!most_sold_products || !most_sold_products.data) return null;
 
   return (

@@ -18,7 +18,6 @@ export async function GET(
         return NextResponse.json(null, { status: 401 });
 
       const businesses = await fetchActiveBusiness(user.id, user.businessId);
-      console.log({ businesses });
       return NextResponse.json(businesses, { status: 200 });
     } catch (error) {
       console.error(error);
