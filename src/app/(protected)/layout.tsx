@@ -3,7 +3,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { redirect } from "next/navigation";
 import { AppSidebar } from "@/components/navigation/app-sidebar";
 import { Separator } from "@/components/ui/separator";
-// import { cookies } from "next/headers";
 import {
   SidebarInset,
   SidebarProvider,
@@ -16,6 +15,19 @@ import { Button } from "@/components/ui/button";
 import { FlipHorizontal, FlipVertical } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+
+const SidebarWrapper = React.memo(function SidebarWrapper({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <SidebarProvider defaultOpen={true}>
+      <AppSidebar />
+      {children}
+    </SidebarProvider>
+  );
+});
 
 export default async function ProtectedLayout({
   children,
@@ -30,22 +42,8 @@ export default async function ProtectedLayout({
   } else if (!session.user.businessId) {
     redirect("/onboarding");
   } else {
-    // const cookieStore = await cookies();
-    // const sidebarState = cookieStore.get("sidebar:state")?.value || "true";
-    // console.log({ sidebarState });
-    // // const defaultOpen = sidebarState === "true" ? true : false;
-    // const sidebarSide =
-    //   (cookieStore.get("sidebar:side")?.value as NavigationSettings["side"]) ||
-    //   "left";
-    // const sidebarVariant =
-    //   (cookieStore.get("sidebar:variant")
-    //     ?.value as NavigationSettings["variant"]) || "sidebar";
-    // const sidebarCollapsible =
-    //   (cookieStore.get("sidebar:collapsible")
-    //     ?.value as NavigationSettings["collapsible"]) || "offcanvas";
     return (
-      <SidebarProvider defaultOpen={true}>
-        <AppSidebar />
+      <SidebarWrapper>
         <SidebarInset>
           <header className="flex h-16 shrink-0 items-center px-4 gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
             <div className="flex items-center gap-2 ">
@@ -92,7 +90,7 @@ export default async function ProtectedLayout({
           </div>
         </SidebarInset>
         <Toaster />
-      </SidebarProvider>
+      </SidebarWrapper>
     );
   }
 }

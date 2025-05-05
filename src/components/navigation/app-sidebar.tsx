@@ -22,83 +22,97 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  // SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { NavUtilities } from "./nav-utilities";
 import { BusinessSwitcherSkeleton, NavUserSkeleton } from "../skeleton-loaders";
-import { Currency } from "@prisma/client";
 
-const data = {
+export const data = {
   navMain: [
     {
+      id: "dashboard",
       title: "Dashboard",
       url: "/dashboard",
       icon: BarChart3,
       isActive: true,
       items: [
         {
+          id: "dashboard-overview",
           title: "Overview",
           url: "/dashboard",
         },
         {
+          id: "dashboard-reports",
           title: "Reports",
           url: "/analytics",
         },
         {
+          id: "dashboard-transactions",
           title: "Transactions",
           url: "/transactions",
         },
         {
+          id: "dashboard-logs",
           title: "Logs",
           url: "/logs",
         },
       ],
     },
     {
+      id: "inventory",
       title: "Inventory",
       url: "#",
       icon: Package,
       items: [
         {
+          id: "inventory-suppliers",
           title: "Manage Suppliers",
           url: "/suppliers",
         },
         {
+          id: "inventory-products",
           title: "Manage Products",
           url: "/products",
         },
       ],
     },
     {
+      id: "stock-alerts",
+      title: "Stock Alerts",
+      url: "#",
+      icon: Database,
+      items: [
+        {
+          id: "stock-alerts-low",
+          title: "Low Stock",
+          url: "/stock-alerts",
+          icon: ShieldCheck,
+        },
+        {
+          id: "stock-alerts-out",
+          title: "Out of Stock",
+          url: "/stock-alerts",
+          icon: FileText,
+        },
+      ],
+    },
+    {
+      id: "operations",
       title: "Operations",
       url: "#",
       icon: Layers,
       isActive: true,
       items: [
         {
+          id: "operations-new-supplier",
           title: "New supplier",
           url: "/add-supplier",
         },
         {
+          id: "operations-new-product",
           title: "New product",
           url: "/add-product",
-        },
-      ],
-    },
-    {
-      title: "Stock Alerts",
-      url: "#",
-      icon: Database,
-      items: [
-        {
-          title: "Low Stock",
-          url: "/stock-alerts",
-          icon: ShieldCheck,
-        },
-        {
-          title: "Out of Stock",
-          url: "/stock-alerts",
-          icon: FileText,
         },
       ],
     },
@@ -106,26 +120,31 @@ const data = {
 
   utilities: [
     {
+      id: "ai-assistant",
       title: "AI Assistant",
       url: "/ai-assistant",
       icon: Bot,
     },
     {
+      id: "payment-portal",
       title: "Payment Portal",
       url: "/payment-portal",
       icon: CreditCard,
     },
     {
+      id: "task-scheduler",
       title: "Task Scheduler",
       url: "/task-scheduler",
       icon: Calendar,
     },
     {
+      id: "financial-calculator",
       title: "Financial Calculator",
       url: "/financial-calculator",
       icon: Calculator,
     },
     {
+      id: "preferences",
       title: "Preferences",
       url: "/preferences",
       icon: Settings,
@@ -133,36 +152,20 @@ const data = {
   ],
 };
 
+const MemoizedNavMain = React.memo(NavMain);
+const MemoizedNavUtilities = React.memo(NavUtilities);
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const businessInitialData = {
-    user_id: "",
-    business_id: "",
-    join_date: new Date(),
-    last_access: new Date(),
-    deleted_at: null,
-    business: {
-      name: "string",
-      deleted_at: new Date(),
-      email: "string",
-      id: "string",
-      registration_number: "string",
-      address: "",
-      tel: "",
-      currency: Currency.USD,
-      created_at: new Date(),
-      updated_at: new Date(),
-    },
-  };
   return (
     <Sidebar {...props}>
       <SidebarHeader>
         <React.Suspense fallback={<BusinessSwitcherSkeleton />}>
-          <BusinessSwitcher initialData={businessInitialData} />
+          <BusinessSwitcher />
         </React.Suspense>
       </SidebarHeader>
       <SidebarContent className="scrollbar-hide">
-        <NavMain items={data.navMain} />
-        <NavUtilities utilities={data.utilities} />
+        <MemoizedNavMain items={data.navMain} />
+        <MemoizedNavUtilities utilities={data.utilities} />
       </SidebarContent>
       <SidebarFooter>
         <React.Suspense fallback={<NavUserSkeleton />}>

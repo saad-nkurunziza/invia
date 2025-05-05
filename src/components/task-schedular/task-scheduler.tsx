@@ -27,7 +27,7 @@ const priorities = ["low", "medium", "high"];
 const categories = ["work", "personal", "urgent"];
 
 const TaskScheduler = () => {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [currentMonth] = useState(new Date());
   const [newTask, setNewTask] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedCategory, setSelectedCategory] = useState("work");

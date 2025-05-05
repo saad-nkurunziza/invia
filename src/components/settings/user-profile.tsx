@@ -83,12 +83,12 @@ export default async function UserProfileBox() {
                 <Card key={account.id}>
                   <CardHeader>
                     <CardTitle className="capitalize">
-                      {account.provider}
+                      {account.providerId}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground">
-                      Connected with: {account.providerAccountId}
+                      Connected with: {account.accessToken}
                     </p>
                   </CardContent>
                 </Card>

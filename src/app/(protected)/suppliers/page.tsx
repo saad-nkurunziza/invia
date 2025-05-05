@@ -5,11 +5,9 @@ import DataTable from "@/components/ui/data-table";
 import { fetchSuppliers } from "@/server/query/supplier";
 import { supplierColumns } from "@/utils/columns/supplier";
 
-const page = async (
-  props: {
-    searchParams: Promise<{ [key: string]: string | undefined }>;
-  }
-) => {
+const page = async (props: {
+  searchParams: Promise<{ [key: string]: string | undefined }>;
+}) => {
   const searchParams = await props.searchParams;
   const crumbsLinks = [
     { label: "Dashboard", href: "/" },

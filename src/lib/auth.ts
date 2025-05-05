@@ -21,7 +21,7 @@ export const auth = betterAuth({
       return {
         user: {
           ...user,
-          businessId: fetchedUser?.businesses?.[0]?.business_id ?? null,
+          businessId: fetchedUser?.businesses?.[0]?.business_id,
           role: fetchedUser?.role,
         },
         session,

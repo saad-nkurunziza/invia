@@ -17,6 +17,7 @@ export function useNetworkStatus() {
     window.addEventListener("offline", handleOffline);
 
     const connection =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       "connection" in navigator && (navigator as any).connection;
 
     if (connection) {

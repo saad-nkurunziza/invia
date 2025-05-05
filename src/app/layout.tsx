@@ -1,11 +1,22 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/containers/theme-provider";
-import { Roboto } from "next/font/google";
+import localFont from "next/font/local";
 
-const inter = Roboto({
-  subsets: ["latin"],
-  weight: ["100", "300", "400", "500", "700"],
+// Load Geist Variable font for body text
+const geist = localFont({
+  src: "./fonts/GeistVF.woff",
+  variable: "--font-geist",
+  display: "swap",
+  preload: true,
+});
+
+// Load Geist Mono for monospaced text
+const geistMono = localFont({
+  src: "./fonts/GeistMonoVF.woff",
+  variable: "--font-geist-mono",
+  display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -19,8 +30,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.className} antialiased`}>
-      <body>
+    <html
+      lang="en"
+      className={`${geist.variable} ${geistMono.variable} antialiased`}
+    >
+      <body className="font-sans">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

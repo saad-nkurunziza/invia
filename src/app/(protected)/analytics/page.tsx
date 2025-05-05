@@ -12,11 +12,9 @@ import TimeShow from "./time-show";
 //   getMostSoldProducts,
 // } from "@/server/monthly-analysis/statements";
 
-const page = async (
-  props: {
-    searchParams: Promise<{ [key: string]: string | undefined }>;
-  }
-) => {
+const page = async (props: {
+  searchParams: Promise<{ [key: string]: string | undefined }>;
+}) => {
   const searchParams = await props.searchParams;
   const crumbsLinks = [
     { label: "Dashboard", href: "/" },

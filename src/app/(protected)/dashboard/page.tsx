@@ -3,10 +3,9 @@ import TitleContainer from "@/components/containers/title-container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CurrentStat from "./current-stat";
 import { Card } from "@/components/ui/card";
-import {
-  // getPurchaseStatistics,
-  getSalesStatistics,
-} from "@/server/services/chart-data";
+import // getPurchaseStatistics,
+// getSalesStatistics,
+"@/server/services/chart-data";
 import CompareStatDaily from "./daily-stat";
 import CompareStatMonthly from "./monthly-stat";
 // import { Watchlists } from "./watchlist";
@@ -15,7 +14,7 @@ import RecentLogs from "./recent-logs";
 // import MostSold from "./most-sold";
 
 const page = async () => {
-  const recent_sales_statistics = await getSalesStatistics();
+  // const recent_sales_statistics = await getSalesStatistics();
   // const recent_purchase_statistics = await getPurchaseStatistics();
   return (
     <div className="space-y-8 flex flex-col justify-center">
