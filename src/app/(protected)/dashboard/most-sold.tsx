@@ -26,7 +26,6 @@ const MostSold = async () => {
       <CardHeader className="flex flex-row items-center">
         <div className="grid gap-2">
           <CardTitle>Most sold products</CardTitle>
-          {/* <CardDescription>Most sold.</CardDescription> */}
         </div>
       </CardHeader>
       <CardContent className="grid gap-8">
