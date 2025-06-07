@@ -68,7 +68,7 @@ const OnboardingCreateForm = () => {
       const response = await create(values);
 
       if ("error" in response) {
-        setFormMessage(response.error);
+        setFormMessage(response.error ?? "");
         setMessageType("error");
       } else {
         setFormMessage(response.success);
