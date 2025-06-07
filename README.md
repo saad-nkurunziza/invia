@@ -13,7 +13,7 @@ The Stock Management App is designed to help businesses efficiently manage their
 
 ## Usage
 
-1. Open your browser and navigate to `http://yourdomain.com`.
+1. Open your browser and navigate to `https://invia-stock.vercel.app`.
 2. Log in with your credentials.
 3. Start managing your stock!
 
