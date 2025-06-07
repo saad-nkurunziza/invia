@@ -1,14 +1,13 @@
 "use server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { AuthResponse } from "@/auth-types";
 import { z } from "zod";
 import { OnboardingJoinSchema } from "@/components/onboarding/onboarding-join";
 import { headers } from "next/headers";
 
 export const join = async (
   values: z.infer<typeof OnboardingJoinSchema>
-): Promise<AuthResponse> => {
+) => {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
