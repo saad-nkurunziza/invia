@@ -49,7 +49,7 @@ const OnboardingJoinForm = () => {
       const response = await join(values);
 
       if ("error" in response) {
-        setFormMessage(response.error);
+        setFormMessage(response.error ?? "");
         setMessageType("error");
         router.push("/dashboard");
       } else {
